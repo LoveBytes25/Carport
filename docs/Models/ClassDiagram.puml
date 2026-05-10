@@ -1,0 +1,232 @@
+@startuml
+
+' =========================
+' APP
+' =========================
+
+class Main {
++ main(String[] args)
+}
+
+' =========================
+' CONFIG
+' =========================
+
+class ThymeleafConfig {
+}
+
+class SessionConfig {
+}
+
+' =========================
+' ENUMS
+' =========================
+
+enum Role {
+  CUSTOMER
+  EMPLOYEE
+  ADMIN
+}
+
+enum RequestStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  COMPLETED
+}
+
+' =========================
+' ENTITIES
+' =========================
+
+class User {
+  - Long id
+  - String email
+  - String password
+  - Role role
+}
+
+class ContactInfo {
+  - Long id
+  - String firstName
+  - String lastName
+  - String address
+  - String phone
+  - String email
+}
+
+class Zip {
+  - Long id
+  - String zipcode
+  - String town
+}
+
+class Request {
+  - Long id
+  - LocalDateTime timestamp
+  - RequestStatus status
+}
+
+class RequestLine {
+  - Long id
+  - Integer quantity
+  - BigDecimal unitPrice
+}
+
+class Component {
+  - Long id
+  - String name
+  - String description
+}
+
+class PriceCatalog {
+  - Long id
+  - BigDecimal unitPrice
+  - LocalDate validFrom
+  - LocalDate validTo
+}
+
+class Carport {
+  - Long id
+  - BigDecimal length
+  - BigDecimal width
+  - BigDecimal height
+  - LocalDateTime timestamp
+}
+
+class CarportComponent {
+  - Long id
+  - Integer quantity
+}
+
+class Shed {
+  - Long id
+  - BigDecimal length
+  - BigDecimal width
+}
+
+class RoofType {
+  - Long id
+  - String name
+}
+
+' =========================
+' MAPPERS (PERSISTENCE)
+' =========================
+
+class UserMapper
+class CarportMapper
+class RequestMapper
+class ComponentMapper
+
+class HikariCP <<connection-pool>>
+
+' =========================
+' SERVICES
+' =========================
+
+class UserService
+class CarportService
+class RequestService
+class ComponentService
+
+' =========================
+' CONTROLLERS
+' =========================
+
+class UserController
+class CarportController
+class RequestController
+class ComponentController
+
+' =========================
+' UTILITIES
+' =========================
+
+class PasswordUtil
+class PriceCalculator
+class ValidationUtil
+
+' =========================
+' EXCEPTIONS
+' =========================
+
+exception DatabaseException
+
+' =========================
+' RELATIONSHIPS (ENTITIES)
+' =========================
+
+User "1" -- "0..*" ContactInfo
+User "1" -- "0..*" Carport
+
+ContactInfo "*" -- "1" Zip
+
+Request "*" -- "1" Carport
+Request "*" -- "1" ContactInfo
+
+Request "1" -- "0..*" RequestLine
+RequestLine "*" -- "1" Component
+
+Component "1" -- "0..*" PriceCatalog
+
+Carport "*" -- "1" RoofType
+Carport "1" -- "0..1" Shed
+
+Carport "1" -- "0..*" CarportComponent
+Component "1" -- "0..*" CarportComponent
+
+' =========================
+' CONTROLLER FLOW
+' =========================
+
+UserController --> UserService
+CarportController --> CarportService
+RequestController --> RequestService
+ComponentController --> ComponentService
+
+' =========================
+' SERVICE FLOW
+' =========================
+
+UserService --> UserMapper
+CarportService --> CarportMapper
+RequestService --> RequestMapper
+ComponentService --> ComponentMapper
+
+' =========================
+' MAPPERS -> ENTITIES
+' =========================
+
+UserMapper --> User
+CarportMapper --> Carport
+RequestMapper --> Request
+ComponentMapper --> Component
+
+' =========================
+' UTILITIES USAGE
+' =========================
+
+UserService --> PasswordUtil
+CarportService --> PriceCalculator
+UserService --> ValidationUtil
+
+' =========================
+' CONFIG
+' =========================
+
+SessionConfig ..> UserController
+ThymeleafConfig ..> UserController
+
+' =========================
+' APPLICATION
+' =========================
+
+Main --> ThymeleafConfig
+Main --> SessionConfig
+Main --> UserController
+Main --> CarportController
+Main --> RequestController
+Main --> ComponentController
+
+@enduml
