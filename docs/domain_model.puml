@@ -1,0 +1,94 @@
+@startuml Fog Carport Domain Model
+
+skinparam classAttributeIconSize 0
+skinparam classFontStyle Bold
+skinparam classBackgroundColor #FFFFEE
+skinparam classBorderColor #888855
+skinparam classHeaderBackgroundColor #FFFFCC
+skinparam arrowColor #555533
+skinparam linetype ortho
+skinparam nodesep 60
+skinparam ranksep 70
+hide members
+hide circle
+
+' ══════════════════════════════════
+' IDENTITY / USER HIERARCHY
+' ══════════════════════════════════
+
+class Visitor
+class Bruger
+class Kunde
+class Salgsperson
+class Admin
+
+' A Visitor can optionally be a registered Bruger
+Visitor <|-- Bruger : <<extends>>
+
+' Bruger subtypes
+Bruger <|-- Kunde
+Bruger <|-- Salgsperson
+Bruger <|-- Admin
+
+' A Visitor can become a Kunde WITHOUT registering
+' (guest checkout — shown as dependency)
+Visitor ..> Kunde : <<kan blive>>
+
+' ══════════════════════════════════
+' FORESPØRGSEL
+' ══════════════════════════════════
+
+class Forespørgsel
+class Carport
+class Skur
+class Tagtype
+
+' Visitor submits Forespørgsel (guest or logged in)
+Visitor "1" --> "0..*" Forespørgsel : indsender
+
+' Salgsperson handles Forespørgsel
+Salgsperson "1" --> "0..*" Forespørgsel : behandler
+
+' Forespørgsel owns Carport (composition)
+Forespørgsel "1" *-- "1" Carport : indeholder
+
+' Carport optionally has Skur (aggregation)
+Carport "1" o-- "0..1" Skur : har
+
+' Carport has one Tagtype (association)
+Carport "1" --> "1" Tagtype : har
+
+' ══════════════════════════════════
+' COMMERCIAL FLOW
+' ══════════════════════════════════
+
+class Tilbud
+class Ordre
+
+' Forespørgsel generates Tilbud (composition)
+Forespørgsel "1" *-- "1" Tilbud : genererer
+
+' Accepted Tilbud results in Ordre (association)
+Tilbud "1" --> "1" Ordre : resulterer i
+
+' ══════════════════════════════════
+' MATERIALS
+' ══════════════════════════════════
+
+class Stykliste
+class StyklisteLinje
+class Materiale
+
+' Ordre releases Stykliste on payment (composition)
+Ordre "1" *-- "1" Stykliste : frigiver
+
+' Stykliste contains StyklisteLinje (composition)
+Stykliste "1" *-- "1..*" StyklisteLinje : indeholder
+
+' StyklisteLinje references Materiale (association)
+StyklisteLinje "0..*" --> "1" Materiale : refererer til
+
+' Admin manages Materiale (dependency)
+Admin ..> Materiale : <<administrerer>>
+
+@enduml
