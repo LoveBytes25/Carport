@@ -18,6 +18,8 @@ class ThymeleafConfig {
 class SessionConfig {
 }
 
+class HikariCP <<connection-pool>>
+
 ' =========================
 ' ENUMS
 ' =========================
@@ -40,14 +42,14 @@ enum RequestStatus {
 ' =========================
 
 class User {
-  - Long id
+  - Int id
   - String email
   - String password
   - Role role
 }
 
 class ContactInfo {
-  - Long id
+  - Int id
   - String firstName
   - String lastName
   - String address
@@ -56,57 +58,61 @@ class ContactInfo {
 }
 
 class Zip {
-  - Long id
+  - Int id
   - String zipcode
   - String town
 }
 
 class Request {
-  - Long id
+  - Int id
   - LocalDateTime timestamp
   - RequestStatus status
 }
 
 class RequestLine {
-  - Long id
+  - Int id
   - Integer quantity
-  - BigDecimal unitPrice
+  - Double unitPrice
 }
 
 class Component {
-  - Long id
+  - Int id
   - String name
+  - Double width
+  - Double height
+  - String unit
   - String description
 }
 
 class PriceCatalog {
-  - Long id
-  - BigDecimal unitPrice
+  - Int id
+  - Double unitPrice
   - LocalDate validFrom
   - LocalDate validTo
 }
 
 class Carport {
-  - Long id
-  - BigDecimal length
-  - BigDecimal width
-  - BigDecimal height
+  - Int id
+  - Double length
+  - Double width
+  - Double height
   - LocalDateTime timestamp
 }
 
 class CarportComponent {
-  - Long id
-  - Integer quantity
+  - Int quantity
+  - Double cutLength
+  - String description
 }
 
 class Shed {
-  - Long id
-  - BigDecimal length
-  - BigDecimal width
+  - Int id
+  - Double length
+  - Double width
 }
 
 class RoofType {
-  - Long id
+  - Int id
   - String name
 }
 
@@ -116,19 +122,25 @@ class RoofType {
 
 class UserMapper
 class CarportMapper
+class CarportComponentMapper
 class RequestMapper
 class ComponentMapper
-
-class HikariCP <<connection-pool>>
 
 ' =========================
 ' SERVICES
 ' =========================
 
 class UserService
+
 class CarportService
+
 class RequestService
+
 class ComponentService
+
+class MaterialCalculationService {
+  + calculate(length, width)
+}
 
 ' =========================
 ' CONTROLLERS
@@ -144,8 +156,18 @@ class ComponentController
 ' =========================
 
 class PasswordUtil
+
 class PriceCalculator
+
 class ValidationUtil
+
+class MaterialRuleUtil <<utility>> {
+  + calculatePosts(length)
+  + calculateRafters(length)
+  + calculateBattens(width)
+  + calculateRoofSheets(width)
+  + calculateScrews(roofSheets)
+}
 
 ' =========================
 ' EXCEPTIONS
@@ -190,9 +212,17 @@ ComponentController --> ComponentService
 ' =========================
 
 UserService --> UserMapper
+
 CarportService --> CarportMapper
+CarportService --> CarportComponentMapper
+CarportService --> MaterialCalculationService
+
 RequestService --> RequestMapper
+
 ComponentService --> ComponentMapper
+
+MaterialCalculationService --> ComponentMapper
+MaterialCalculationService --> MaterialRuleUtil
 
 ' =========================
 ' MAPPERS -> ENTITIES
@@ -200,6 +230,7 @@ ComponentService --> ComponentMapper
 
 UserMapper --> User
 CarportMapper --> Carport
+CarportComponentMapper --> CarportComponent
 RequestMapper --> Request
 ComponentMapper --> Component
 
@@ -208,8 +239,9 @@ ComponentMapper --> Component
 ' =========================
 
 UserService --> PasswordUtil
-CarportService --> PriceCalculator
 UserService --> ValidationUtil
+
+CarportService --> PriceCalculator
 
 ' =========================
 ' CONFIG
@@ -218,12 +250,19 @@ UserService --> ValidationUtil
 SessionConfig ..> UserController
 ThymeleafConfig ..> UserController
 
+HikariCP ..> UserMapper
+HikariCP ..> CarportMapper
+HikariCP ..> RequestMapper
+HikariCP ..> ComponentMapper
+HikariCP ..> CarportComponentMapper
+
 ' =========================
 ' APPLICATION
 ' =========================
 
 Main --> ThymeleafConfig
 Main --> SessionConfig
+
 Main --> UserController
 Main --> CarportController
 Main --> RequestController
