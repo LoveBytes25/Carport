@@ -1,14 +1,36 @@
 package app.entities;
 
 public class CarportComponent {
-    int quantity;
-    Double cutLength;
-    String description;
+    private Carport carport;
+    private Component component;
+    private int quantity;
+    private String description;
 
-    public CarportComponent(int quantity, Double cutLength, String description) {
+    public CarportComponent() {
+
+    }
+
+    public CarportComponent(Carport carport, Component component, int quantity, String description) {
+        this.carport = carport;
+        this.component = component;
         this.quantity = quantity;
-        this.cutLength = cutLength;
         this.description = description;
+    }
+
+    public Carport getCarport() {
+        return carport;
+    }
+
+    public void setCarport(Carport carport) {
+        this.carport = carport;
+    }
+
+    public Component getComponent() {
+        return component;
+    }
+
+    public void setComponent(Component component) {
+        this.component = component;
     }
 
     public int getQuantity() {
@@ -17,14 +39,6 @@ public class CarportComponent {
 
     public void setQuantity(int quantity) {
         this.quantity = quantity;
-    }
-
-    public Double getCutLength() {
-        return cutLength;
-    }
-
-    public void setCutLength(Double cutLength) {
-        this.cutLength = cutLength;
     }
 
     public String getDescription() {
