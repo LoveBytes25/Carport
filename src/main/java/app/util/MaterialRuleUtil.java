@@ -2,28 +2,26 @@ package app.util;
 
 public class MaterialRuleUtil {
 
-    public static int calculatePosts(double length) {
-
-        return ((int)Math.ceil(length / 300) + 1) * 2;
+    private MaterialRuleUtil() {
     }
 
-    public static int calculateRafters(double length) {
+    public static int calculatePostQuantity(double carportLength) {
 
-        return (int)Math.ceil(length / 55.0);
+        return ((int) Math.ceil(carportLength / 300.0) + 1) * 2;
     }
 
-    public static int calculateBattens(double width) {
+    public static int calculateRafterQuantity(double carportLength) {
 
-        return (int)Math.ceil(width / 35.0);
+        return (int) Math.ceil(carportLength / 55.0);
     }
 
-    public static int calculateRoofSheets(double width) {
+    public static int calculateRoofSheetQuantity(double carportWidth) {
 
-        return (int)Math.ceil(width / 100.0);
+        return (int) Math.ceil(carportWidth / 100.0);
     }
 
-    public static int calculateScrews(int roofSheets) {
+    public static int calculateBeamQuantity() {
 
-        return roofSheets * 12;
+        return 2;
     }
 }
