@@ -12,6 +12,8 @@
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <hikariCP.version>6.2.1</hikariCP.version>
+        <postgresql.version>42.7.5</postgresql.version>
     </properties>
     <dependencies>
         <dependency>
@@ -25,6 +27,16 @@
             <artifactId>junit-jupiter</artifactId>
             <version>5.8.1</version>
             <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.zaxxer</groupId>
+            <artifactId>HikariCP</artifactId>
+            <version>${hikariCP.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+            <version>${postgresql.version}</version>
         </dependency>
     </dependencies>
 
