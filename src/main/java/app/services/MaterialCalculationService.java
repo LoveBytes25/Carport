@@ -105,8 +105,8 @@ public class MaterialCalculationService {
 
         Component roofSheet = ComponentMapper.findComponent(
                 "Tagplade",
-                0,
-                0,
+                100,
+                1,
                 600,
                 connectionPool
         );
