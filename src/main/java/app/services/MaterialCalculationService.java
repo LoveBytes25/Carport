@@ -2,10 +2,10 @@ package app.services;
 
 import app.entities.CarportComponent;
 import app.entities.Component;
-import app.persistence.ComponentMapper;
-import app.util.MaterialRuleUtil;
 import app.exception.DatabaseException;
+import app.persistence.ComponentMapper;
 import app.persistence.ConnectionPool;
+import app.util.MaterialRuleUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,107 +14,168 @@ public class MaterialCalculationService {
 
     private final ConnectionPool connectionPool;
 
-    public MaterialCalculationService(ConnectionPool connectionPool) {
+    public MaterialCalculationService(
+            ConnectionPool connectionPool) {
+
         this.connectionPool = connectionPool;
     }
 
     public List<CarportComponent> calculate(
             double carportLength,
-            double carportWidth) throws DatabaseException {
+            double carportWidth)
+            throws DatabaseException {
 
         List<CarportComponent> bom = new ArrayList<>();
 
         calculatePosts(carportLength, bom);
 
-        calculateBeams(bom);
+        calculateBeams(carportLength, bom);
 
-        calculateRafters(carportLength, bom);
+        calculateRafters(
+                carportLength,
+                carportWidth,
+                bom
+        );
 
-        calculateRoofSheets(carportWidth, bom);
+        calculateRoofSheets(
+                carportLength,
+                carportWidth,
+                bom
+        );
 
         return bom;
     }
 
-    private void calculatePosts(double carportLength, List<CarportComponent> bom)
+    private void calculatePosts(
+            double carportLength,
+            List<CarportComponent> bom)
             throws DatabaseException {
 
-        int quantity = MaterialRuleUtil.calculatePostQuantity(carportLength);
+        int quantity =
+                MaterialRuleUtil.calculatePostQuantity(
+                        carportLength
+                );
 
-        Component post = ComponentMapper.findComponent(
-                "Stolpe",
-                97,
-                97,
-                300,
-                connectionPool
-        );
+        double requiredLength =
+                MaterialRuleUtil.calculatePostLength();
 
-        CarportComponent row = new CarportComponent();
+        Component post =
+                ComponentMapper.findBestComponent(
+                        "Stolpe",
+                        requiredLength,
+                        connectionPool
+                );
+
+        CarportComponent row =
+                new CarportComponent();
+
         row.setComponent(post);
         row.setQuantity(quantity);
-        row.setDescription("Stolper nedgraves 90 cm i jord");
+        row.setDescription(
+                "Stolper nedgraves 90 cm i jord"
+        );
 
         bom.add(row);
     }
 
-    private void calculateBeams(List<CarportComponent> bom)
+    private void calculateBeams(
+            double carportLength,
+            List<CarportComponent> bom)
             throws DatabaseException {
 
-        int quantity = MaterialRuleUtil.calculateBeamQuantity();
+        int quantity =
+                MaterialRuleUtil.calculateBeamQuantity();
 
-        Component beam = ComponentMapper.findComponent(
-                "Rem",
-                45,
-                195,
-                600,
-                connectionPool
-        );
+        double requiredLength =
+                MaterialRuleUtil.calculateBeamLength(
+                        carportLength
+                );
 
-        CarportComponent row = new CarportComponent();
+        Component beam =
+                ComponentMapper.findBestComponent(
+                        "Rem",
+                        requiredLength,
+                        connectionPool
+                );
+
+        CarportComponent row =
+                new CarportComponent();
+
         row.setComponent(beam);
         row.setQuantity(quantity);
-        row.setDescription("Remme i sider");
+        row.setDescription(
+                "Remme i sider"
+        );
 
         bom.add(row);
     }
 
-    private void calculateRafters(double carportLength, List<CarportComponent> bom)
+    private void calculateRafters(
+            double carportLength,
+            double carportWidth,
+            List<CarportComponent> bom)
             throws DatabaseException {
 
-        int quantity = MaterialRuleUtil.calculateRafterQuantity(carportLength);
+        int quantity =
+                MaterialRuleUtil.calculateRafterQuantity(
+                        carportLength
+                );
 
-        Component rafter = ComponentMapper.findComponent(
-                "Spær",
-                45,
-                195,
-                600,
-                connectionPool
-        );
+        double requiredLength =
+                MaterialRuleUtil.calculateRafterLength(
+                        carportWidth
+                );
 
-        CarportComponent row = new CarportComponent();
+        Component rafter =
+                ComponentMapper.findBestComponent(
+                        "Spær",
+                        requiredLength,
+                        connectionPool
+                );
+
+        CarportComponent row =
+                new CarportComponent();
+
         row.setComponent(rafter);
         row.setQuantity(quantity);
-        row.setDescription("Spær monteres på rem");
+        row.setDescription(
+                "Spær monteres på rem"
+        );
 
         bom.add(row);
     }
 
-    private void calculateRoofSheets(double carportWidth, List<CarportComponent> bom)
+    private void calculateRoofSheets(
+            double carportLength,
+            double carportWidth,
+            List<CarportComponent> bom)
             throws DatabaseException {
 
-        int quantity = MaterialRuleUtil.calculateRoofSheetQuantity(carportWidth);
+        int quantity =
+                MaterialRuleUtil.calculateRoofSheetQuantity(
+                        carportWidth
+                );
 
-        Component roofSheet = ComponentMapper.findComponent(
-                "Tagplade",
-                100,
-                1,
-                600,
-                connectionPool
-        );
+        double requiredLength =
+                MaterialRuleUtil.calculateRoofSheetLength(
+                        carportLength
+                );
 
-        CarportComponent row = new CarportComponent();
+        Component roofSheet =
+                ComponentMapper.findBestComponent(
+                        "Tagplade",
+                        requiredLength,
+                        connectionPool
+                );
+
+        CarportComponent row =
+                new CarportComponent();
+
         row.setComponent(roofSheet);
         row.setQuantity(quantity);
-        row.setDescription("Tagplader monteres på spær");
+        row.setDescription(
+                "Tagplader monteres på spær"
+        );
 
         bom.add(row);
     }
