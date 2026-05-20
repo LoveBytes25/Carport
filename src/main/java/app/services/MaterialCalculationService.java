@@ -2,9 +2,14 @@ package app.services;
 
 import app.entities.CarportComponent;
 import app.entities.Component;
+import app.entities.MaterialSelection;
+
 import app.exception.DatabaseException;
+
 import app.persistence.ComponentMapper;
 import app.persistence.ConnectionPool;
+
+import app.util.MaterialOptimizer;
 import app.util.MaterialRuleUtil;
 
 import java.util.ArrayList;
@@ -14,8 +19,7 @@ public class MaterialCalculationService {
 
     private final ConnectionPool connectionPool;
 
-    public MaterialCalculationService(
-            ConnectionPool connectionPool) {
+    public MaterialCalculationService(ConnectionPool connectionPool) {
 
         this.connectionPool = connectionPool;
     }
@@ -43,6 +47,14 @@ public class MaterialCalculationService {
                 bom
         );
 
+        calculateUnderSternSides(carportLength, bom);
+
+        calculateUnderSternFront(carportWidth, bom);
+
+        calculateOverSternSides(carportLength, bom);
+
+        calculateOverSternFront(carportWidth, bom);
+
         return bom;
     }
 
@@ -52,131 +64,258 @@ public class MaterialCalculationService {
             throws DatabaseException {
 
         int quantity =
-                MaterialRuleUtil.calculatePostQuantity(
-                        carportLength
-                );
+                MaterialRuleUtil
+                        .calculatePostQuantity(
+                                carportLength
+                        );
 
-        double requiredLength =
-                MaterialRuleUtil.calculatePostLength();
+        List<Component> stock =
+                ComponentMapper
+                        .findComponentsByName(
+                                "Stolpe",
+                                connectionPool
+                        );
 
-        Component post =
-                ComponentMapper.findBestComponent(
-                        "Stolpe",
-                        requiredLength,
-                        connectionPool
-                );
+        MaterialSelection selection =
+                MaterialOptimizer
+                        .findBestCombination(
+                                stock,
+                                300
+                        );
 
-        CarportComponent row =
-                new CarportComponent();
+        for (Component component : selection.getComponents()) {
 
-        row.setComponent(post);
-        row.setQuantity(quantity);
-        row.setDescription(
-                "Stolper nedgraves 90 cm i jord"
-        );
+            CarportComponent row = new CarportComponent();
 
-        bom.add(row);
+            row.setComponent(component);
+
+            row.setQuantity(quantity);
+
+            row.setDescription("Stolper nedgraves 90 cm i jord");
+
+            bom.add(row);
+        }
     }
 
-    private void calculateBeams(
-            double carportLength,
-            List<CarportComponent> bom)
-            throws DatabaseException {
+    private void calculateBeams(double carportLength, List<CarportComponent> bom) throws DatabaseException {
 
-        int quantity =
-                MaterialRuleUtil.calculateBeamQuantity();
+        List<Component> stock =
+                ComponentMapper
+                        .findComponentsByName(
+                                "Rem",
+                                connectionPool
+                        );
 
-        double requiredLength =
-                MaterialRuleUtil.calculateBeamLength(
-                        carportLength
-                );
+        MaterialSelection selection =
+                MaterialOptimizer
+                        .findBestCombination(
+                                stock,
+                                carportLength
+                        );
 
-        Component beam =
-                ComponentMapper.findBestComponent(
-                        "Rem",
-                        requiredLength,
-                        connectionPool
-                );
+        for (Component component : selection.getComponents()) {
 
-        CarportComponent row =
-                new CarportComponent();
+            CarportComponent row = new CarportComponent();
 
-        row.setComponent(beam);
-        row.setQuantity(quantity);
-        row.setDescription(
-                "Remme i sider"
-        );
+            row.setComponent(component);
 
-        bom.add(row);
+            row.setQuantity(2);
+
+            row.setDescription("Remme i sider");
+
+            bom.add(row);
+        }
     }
 
-    private void calculateRafters(
-            double carportLength,
-            double carportWidth,
-            List<CarportComponent> bom)
-            throws DatabaseException {
+    private void calculateRafters(double carportLength, double carportWidth, List<CarportComponent> bom) throws DatabaseException {
 
         int quantity =
-                MaterialRuleUtil.calculateRafterQuantity(
-                        carportLength
-                );
+                MaterialRuleUtil
+                        .calculateRafterQuantity(
+                                carportLength
+                        );
 
-        double requiredLength =
-                MaterialRuleUtil.calculateRafterLength(
-                        carportWidth
-                );
+        List<Component> stock =
+                ComponentMapper
+                        .findComponentsByName(
+                                "Spær",
+                                connectionPool
+                        );
 
-        Component rafter =
-                ComponentMapper.findBestComponent(
-                        "Spær",
-                        requiredLength,
-                        connectionPool
-                );
+        MaterialSelection selection =
+                MaterialOptimizer
+                        .findBestCombination(
+                                stock,
+                                carportWidth
+                        );
 
-        CarportComponent row =
-                new CarportComponent();
+        for (Component component : selection.getComponents()) {
 
-        row.setComponent(rafter);
-        row.setQuantity(quantity);
-        row.setDescription(
-                "Spær monteres på rem"
-        );
+            CarportComponent row = new CarportComponent();
 
-        bom.add(row);
+            row.setComponent(component);
+
+            row.setQuantity(quantity);
+
+            row.setDescription("Spær monteres på rem");
+
+            bom.add(row);
+        }
     }
 
-    private void calculateRoofSheets(
-            double carportLength,
-            double carportWidth,
-            List<CarportComponent> bom)
-            throws DatabaseException {
+    private void calculateRoofSheets(double carportLength, double carportWidth, List<CarportComponent> bom) throws DatabaseException {
 
         int quantity =
-                MaterialRuleUtil.calculateRoofSheetQuantity(
-                        carportWidth
-                );
+                MaterialRuleUtil
+                        .calculateRoofSheetQuantity(
+                                carportWidth
+                        );
 
-        double requiredLength =
-                MaterialRuleUtil.calculateRoofSheetLength(
-                        carportLength
-                );
+        List<Component> stock =
+                ComponentMapper
+                        .findComponentsByName(
+                                "Tagplade",
+                                connectionPool
+                        );
 
-        Component roofSheet =
-                ComponentMapper.findBestComponent(
-                        "Tagplade",
-                        requiredLength,
-                        connectionPool
-                );
+        MaterialSelection selection =
+                MaterialOptimizer
+                        .findBestCombination(
+                                stock,
+                                carportLength
+                        );
 
-        CarportComponent row =
-                new CarportComponent();
+        for (Component component : selection.getComponents()) {
 
-        row.setComponent(roofSheet);
-        row.setQuantity(quantity);
-        row.setDescription(
-                "Tagplader monteres på spær"
-        );
+            CarportComponent row = new CarportComponent();
 
-        bom.add(row);
+            row.setComponent(component);
+
+            row.setQuantity(quantity);
+
+            row.setDescription("Tagplader monteres på spær");
+
+            bom.add(row);
+        }
+    }
+
+    private void calculateUnderSternSides(double carportLength, List<CarportComponent> bom) throws DatabaseException {
+
+        List<Component> stock =
+                ComponentMapper
+                        .findComponentsByName(
+                                "Understernbræt",
+                                connectionPool
+                        );
+
+        MaterialSelection selection =
+                MaterialOptimizer
+                        .findBestCombination(
+                                stock,
+                                carportLength
+                        );
+
+        for (Component component : selection.getComponents()) {
+
+            CarportComponent row = new CarportComponent();
+
+            row.setComponent(component);
+
+            row.setQuantity(2);
+
+            row.setDescription("Understernbrædder til sider");
+
+            bom.add(row);
+        }
+    }
+
+    private void calculateUnderSternFront(double carportWidth, List<CarportComponent> bom) throws DatabaseException {
+
+        List<Component> stock =
+                ComponentMapper
+                        .findComponentsByName(
+                                "Understernbræt",
+                                connectionPool
+                        );
+
+        MaterialSelection selection =
+                MaterialOptimizer
+                        .findBestCombination(
+                                stock,
+                                carportWidth
+                        );
+
+        for (Component component : selection.getComponents()) {
+
+            CarportComponent row = new CarportComponent();
+
+            row.setComponent(component);
+
+            row.setQuantity(2);
+
+            row.setDescription("Understernbrædder til forende");
+
+            bom.add(row);
+        }
+    }
+
+    private void calculateOverSternSides(double carportLength, List<CarportComponent> bom) throws DatabaseException {
+
+        List<Component> stock =
+                ComponentMapper
+                        .findComponentsByName(
+                                "Oversternbræt",
+                                connectionPool
+                        );
+
+        MaterialSelection selection =
+                MaterialOptimizer
+                        .findBestCombination(
+                                stock,
+                                carportLength
+                        );
+
+        for (Component component : selection.getComponents()) {
+
+            CarportComponent row = new CarportComponent();
+
+            row.setComponent(component);
+
+            row.setQuantity(2);
+
+            row.setDescription("Oversternbrædder til sider");
+
+            bom.add(row);
+        }
+    }
+
+    private void calculateOverSternFront(double carportWidth, List<CarportComponent> bom) throws DatabaseException {
+
+        List<Component> stock =
+                ComponentMapper
+                        .findComponentsByName(
+                                "Oversternbræt",
+                                connectionPool
+                        );
+
+        MaterialSelection selection =
+                MaterialOptimizer
+                        .findBestCombination(
+                                stock,
+                                carportWidth
+                        );
+
+        for (Component component : selection.getComponents()) {
+
+            CarportComponent row = new CarportComponent();
+
+            row.setComponent(component);
+
+            row.setQuantity(2);
+
+            row.setDescription("Oversternbrædder til forende");
+
+            bom.add(row);
+        }
     }
 }
