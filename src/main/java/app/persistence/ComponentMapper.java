@@ -39,6 +39,7 @@ public class ComponentMapper {
             List<Component> components = new ArrayList<>();
 
             while (rs.next()) {
+
                 components.add(mapComponent(rs));
             }
 
