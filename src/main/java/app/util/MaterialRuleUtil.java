@@ -5,9 +5,12 @@ public class MaterialRuleUtil {
     private MaterialRuleUtil() {
     }
 
-    public static int calculatePostQuantity(double carportLength) {
+    public static int calculatePostQuantity(
+            double carportLength) {
 
-        return ((int) Math.ceil(carportLength / 300.0) + 1) * 2;
+        return ((int)
+                Math.ceil(carportLength / 300.0)
+                + 1) * 2;
     }
 
     public static double calculatePostLength() {
@@ -20,28 +23,55 @@ public class MaterialRuleUtil {
         return 2;
     }
 
-    public static double calculateBeamLength(double carportLength) {
+    public static double calculateBeamLength(
+            double carportLength) {
 
         return carportLength;
     }
 
-    public static int calculateRafterQuantity(double carportLength) {
+    public static int calculateRafterQuantity(
+            double carportLength) {
 
-        return (int) Math.ceil(carportLength / 55.0);
+        return (int)
+                Math.ceil(carportLength / 55.0);
     }
 
-    public static double calculateRafterLength(double carportWidth) {
+    public static double calculateRafterLength(
+            double carportWidth) {
 
         return carportWidth;
     }
 
-    public static int calculateRoofSheetQuantity(double carportWidth) {
+    public static int calculateRoofSheetQuantity(
+            double carportWidth) {
 
-        return (int) Math.ceil(carportWidth / 100.0);
+        return (int)
+                Math.ceil(carportWidth / 100.0);
     }
 
-    public static double calculateRoofSheetLength(double carportLength) {
+    public static double calculateRoofSheetLength(
+            double carportLength) {
 
         return carportLength;
+    }
+
+    public static int calculateUnderSternSideQuantity() {
+
+        return 2;
+    }
+
+    public static int calculateUnderSternFrontQuantity() {
+
+        return 2;
+    }
+
+    public static int calculateOverSternSideQuantity() {
+
+        return 2;
+    }
+
+    public static int calculateOverSternFrontQuantity() {
+
+        return 2;
     }
 }
