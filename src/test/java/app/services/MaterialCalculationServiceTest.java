@@ -1,8 +1,16 @@
 package app.services;
 
 import app.entities.CarportComponent;
+import app.entities.Component;
+import app.entities.MaterialSelection;
+
 import app.exception.DatabaseException;
+
+import app.persistence.ComponentMapper;
 import app.persistence.ConnectionPool;
+
+import app.util.MaterialOptimizer;
+import app.util.MaterialRuleUtil;
 
 import org.junit.jupiter.api.Test;
 
@@ -12,23 +20,42 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class MaterialCalculationServiceTest {
 
-    private final MaterialCalculationService service =
-            new MaterialCalculationService(
-                    ConnectionPool.getInstance()
-            );
-
     @Test
-    void calculateShouldGenerateBom()
+    void calculateFlatRoofShouldGenerateBom()
             throws DatabaseException {
 
         List<CarportComponent> bom =
-                service.calculate(600, 360);
+                new MaterialCalculationService(
+                        ConnectionPool.getInstance()
+                ).calculate(
+                        6000,
+                        3600,
+                        "flat",
+                        0
+                );
 
         assertNotNull(bom);
 
         assertFalse(bom.isEmpty());
+    }
 
-        assertTrue(bom.size() >= 8);
+    @Test
+    void calculatePitchedRoofShouldGenerateBom()
+            throws DatabaseException {
+
+        List<CarportComponent> bom =
+                new MaterialCalculationService(
+                        ConnectionPool.getInstance()
+                ).calculate(
+                        7200,
+                        4200,
+                        "angled",
+                        25
+                );
+
+        assertNotNull(bom);
+
+        assertFalse(bom.isEmpty());
     }
 
     @Test
@@ -36,16 +63,19 @@ class MaterialCalculationServiceTest {
             throws DatabaseException {
 
         List<CarportComponent> bom =
-                service.calculate(600, 360);
+                new MaterialCalculationService(
+                        ConnectionPool.getInstance()
+                ).calculate(
+                        6000,
+                        3600,
+                        "flat",
+                        0
+                );
 
-        boolean found =
-                bom.stream()
-                        .anyMatch(c ->
-                                c.getComponent()
-                                        .getName()
-                                        .equals("Stolpe"));
-
-        assertTrue(found);
+        assertEquals(
+                "Stolpe",
+                bom.get(0).getComponent().getName()
+        );
     }
 
     @Test
@@ -53,16 +83,19 @@ class MaterialCalculationServiceTest {
             throws DatabaseException {
 
         List<CarportComponent> bom =
-                service.calculate(600, 360);
+                new MaterialCalculationService(
+                        ConnectionPool.getInstance()
+                ).calculate(
+                        6000,
+                        3600,
+                        "flat",
+                        0
+                );
 
-        boolean found =
-                bom.stream()
-                        .anyMatch(c ->
-                                c.getComponent()
-                                        .getName()
-                                        .equals("Rem"));
-
-        assertTrue(found);
+        assertEquals(
+                "Rem",
+                bom.get(1).getComponent().getName()
+        );
     }
 
     @Test
@@ -70,24 +103,34 @@ class MaterialCalculationServiceTest {
             throws DatabaseException {
 
         List<CarportComponent> bom =
-                service.calculate(600, 360);
+                new MaterialCalculationService(
+                        ConnectionPool.getInstance()
+                ).calculate(
+                        6000,
+                        3600,
+                        "flat",
+                        0
+                );
 
-        boolean found =
-                bom.stream()
-                        .anyMatch(c ->
-                                c.getComponent()
-                                        .getName()
-                                        .equals("Spær"));
-
-        assertTrue(found);
+        assertEquals(
+                "Spær",
+                bom.get(2).getComponent().getName()
+        );
     }
 
     @Test
-    void calculateShouldContainRoofSheets()
+    void calculateFlatRoofShouldContainRoofSheets()
             throws DatabaseException {
 
         List<CarportComponent> bom =
-                service.calculate(600, 360);
+                new MaterialCalculationService(
+                        ConnectionPool.getInstance()
+                ).calculate(
+                        6000,
+                        3600,
+                        "flat",
+                        0
+                );
 
         boolean found =
                 bom.stream()
@@ -100,21 +143,51 @@ class MaterialCalculationServiceTest {
     }
 
     @Test
+    void calculatePitchedRoofShouldContainTiles()
+            throws DatabaseException {
+
+        List<CarportComponent> bom =
+                new MaterialCalculationService(
+                        ConnectionPool.getInstance()
+                ).calculate(
+                        7200,
+                        4200,
+                        "angled",
+                        25
+                );
+
+        boolean found =
+                bom.stream()
+                        .anyMatch(c ->
+                                c.getComponent()
+                                        .getName()
+                                        .equals("Tagsten"));
+
+        assertTrue(found);
+    }
+
+    @Test
     void calculateShouldContainUnderStern()
             throws DatabaseException {
 
         List<CarportComponent> bom =
-                service.calculate(600, 360);
+                new MaterialCalculationService(
+                        ConnectionPool.getInstance()
+                ).calculate(
+                        6000,
+                        3600,
+                        "flat",
+                        0
+                );
 
-        long count =
+        boolean found =
                 bom.stream()
-                        .filter(c ->
+                        .anyMatch(c ->
                                 c.getComponent()
                                         .getName()
-                                        .equals("Understernbræt"))
-                        .count();
+                                        .equals("Understernbræt"));
 
-        assertTrue(count >= 2);
+        assertTrue(found);
     }
 
     @Test
@@ -122,80 +195,296 @@ class MaterialCalculationServiceTest {
             throws DatabaseException {
 
         List<CarportComponent> bom =
-                service.calculate(600, 360);
+                new MaterialCalculationService(
+                        ConnectionPool.getInstance()
+                ).calculate(
+                        6000,
+                        3600,
+                        "flat",
+                        0
+                );
 
-        long count =
+        boolean found =
                 bom.stream()
-                        .filter(c ->
+                        .anyMatch(c ->
                                 c.getComponent()
                                         .getName()
-                                        .equals("Oversternbræt"))
-                        .count();
+                                        .equals("Oversternbræt"));
 
-        assertTrue(count >= 2);
+        assertTrue(found);
     }
 
     @Test
-    void calculateSmallCarport()
+    void flatRoofShouldCalculateCorrectRafterQuantity()
             throws DatabaseException {
 
         List<CarportComponent> bom =
-                service.calculate(420, 300);
+                new MaterialCalculationService(
+                        ConnectionPool.getInstance()
+                ).calculate(
+                        6000,
+                        3600,
+                        "flat",
+                        0
+                );
 
-        assertNotNull(bom);
-
-        assertFalse(bom.isEmpty());
-
-        int posts =
-                bom.stream()
-                        .filter(c ->
-                                c.getComponent()
-                                        .getName()
-                                        .equals("Stolpe"))
-                        .mapToInt(CarportComponent::getQuantity)
-                        .sum();
-
-        assertEquals(6, posts);
-    }
-
-    @Test
-    void calculateLargeCarport()
-            throws DatabaseException {
-
-        List<CarportComponent> bom =
-                service.calculate(780, 600);
-
-        assertNotNull(bom);
-
-        assertFalse(bom.isEmpty());
-
-        int rafters =
+        CarportComponent rafters =
                 bom.stream()
                         .filter(c ->
                                 c.getComponent()
                                         .getName()
                                         .equals("Spær"))
-                        .mapToInt(CarportComponent::getQuantity)
-                        .sum();
+                        .findFirst()
+                        .orElse(null);
 
-        assertTrue(rafters >= 14);
+        assertNotNull(rafters);
+
+        assertEquals(
+                11,
+                rafters.getQuantity()
+        );
     }
 
     @Test
-    void optimizerShouldUseMultipleBoards()
+    void angledRoofShouldCalculateCorrectRafterQuantity()
             throws DatabaseException {
 
         List<CarportComponent> bom =
-                service.calculate(780, 360);
+                new MaterialCalculationService(
+                        ConnectionPool.getInstance()
+                ).calculate(
+                        7200,
+                        4200,
+                        "angled",
+                        25
+                );
 
-        long remCount =
+        CarportComponent rafters =
+                bom.stream()
+                        .filter(c ->
+                                c.getComponent()
+                                        .getName()
+                                        .equals("Spær"))
+                        .findFirst()
+                        .orElse(null);
+
+        assertNotNull(rafters);
+
+        assertEquals(
+                14,
+                rafters.getQuantity()
+        );
+    }
+
+    @Test
+    void beamShouldChooseClosestPossibleLength()
+            throws DatabaseException {
+
+        List<CarportComponent> bom =
+                new MaterialCalculationService(
+                        ConnectionPool.getInstance()
+                ).calculate(
+                        5400,
+                        3600,
+                        "flat",
+                        0
+                );
+
+        CarportComponent beam =
                 bom.stream()
                         .filter(c ->
                                 c.getComponent()
                                         .getName()
                                         .equals("Rem"))
-                        .count();
+                        .findFirst()
+                        .orElse(null);
 
-        assertTrue(remCount >= 2);
+        assertNotNull(beam);
+
+        assertEquals(
+                6000,
+                beam.getComponent().getLength()
+        );
+    }
+
+    @Test
+    void pitchedRoofShouldCalculateLongerRafters() {
+
+        double length =
+                MaterialRuleUtil
+                        .calculatePitchedRafterLength(
+                                3600,
+                                25
+                        );
+
+        assertTrue(length > 3600);
+    }
+
+    @Test
+    void pitchedRoofShouldCalculateCorrectLength() {
+
+        double result =
+                MaterialRuleUtil
+                        .calculatePitchedRafterLength(
+                                3600,
+                                25
+                        );
+
+        assertEquals(
+                3972,
+                Math.round(result)
+        );
+    }
+
+    @Test
+    void flatRoofShouldUseTagplader()
+            throws DatabaseException {
+
+        List<CarportComponent> bom =
+                new MaterialCalculationService(
+                        ConnectionPool.getInstance()
+                ).calculate(
+                        6000,
+                        3600,
+                        "flat",
+                        0
+                );
+
+        boolean hasSheets =
+                bom.stream()
+                        .anyMatch(c ->
+                                c.getComponent()
+                                        .getName()
+                                        .equals("Tagplade"));
+
+        boolean hasTiles =
+                bom.stream()
+                        .anyMatch(c ->
+                                c.getComponent()
+                                        .getName()
+                                        .equals("Tagsten"));
+
+        assertTrue(hasSheets);
+
+        assertFalse(hasTiles);
+    }
+
+    @Test
+    void angledRoofShouldUseTagsten()
+            throws DatabaseException {
+
+        List<CarportComponent> bom =
+                new MaterialCalculationService(
+                        ConnectionPool.getInstance()
+                ).calculate(
+                        7200,
+                        4200,
+                        "angled",
+                        25
+                );
+
+        boolean hasSheets =
+                bom.stream()
+                        .anyMatch(c ->
+                                c.getComponent()
+                                        .getName()
+                                        .equals("Tagplade"));
+
+        boolean hasTiles =
+                bom.stream()
+                        .anyMatch(c ->
+                                c.getComponent()
+                                        .getName()
+                                        .equals("Tagsten"));
+
+        assertFalse(hasSheets);
+
+        assertTrue(hasTiles);
+    }
+
+    @Test
+    void optimizerShouldChooseLeastWaste()
+            throws DatabaseException {
+
+        List<Component> stock =
+                ComponentMapper.findComponentsByName(
+                        "Rem",
+                        ConnectionPool.getInstance()
+                );
+
+        MaterialSelection selection =
+                MaterialOptimizer.findBestCombination(
+                        stock,
+                        5400
+                );
+
+        assertEquals(
+                6000,
+                selection.getComponents()
+                        .get(0)
+                        .getLength()
+        );
+    }
+
+    @Test
+    void largerCarportShouldRequireMorePosts()
+            throws DatabaseException {
+
+        List<CarportComponent> bom =
+                new MaterialCalculationService(
+                        ConnectionPool.getInstance()
+                ).calculate(
+                        7800,
+                        4200,
+                        "flat",
+                        0
+                );
+
+        CarportComponent posts =
+                bom.stream()
+                        .filter(c ->
+                                c.getComponent()
+                                        .getName()
+                                        .equals("Stolpe"))
+                        .findFirst()
+                        .orElse(null);
+
+        assertNotNull(posts);
+
+        assertEquals(
+                8,
+                posts.getQuantity()
+        );
+    }
+
+    @Test
+    void largerCarportShouldRequireMoreRafters()
+            throws DatabaseException {
+
+        List<CarportComponent> bom =
+                new MaterialCalculationService(
+                        ConnectionPool.getInstance()
+                ).calculate(
+                        7800,
+                        4200,
+                        "flat",
+                        0
+                );
+
+        CarportComponent rafters =
+                bom.stream()
+                        .filter(c ->
+                                c.getComponent()
+                                        .getName()
+                                        .equals("Spær"))
+                        .findFirst()
+                        .orElse(null);
+
+        assertNotNull(rafters);
+
+        assertEquals(
+                15,
+                rafters.getQuantity()
+        );
     }
 }
