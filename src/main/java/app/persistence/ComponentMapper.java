@@ -7,27 +7,35 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+
 public class ComponentMapper {
 
-    public static Component findComponent(String name, double width, double height, double length, ConnectionPool connectionPool)
+    public static Component findBestComponent(
+            String name,
+            double requiredLength,
+            ConnectionPool connectionPool)
             throws DatabaseException {
 
         String sql = """
-                SELECT cp_id, name, width, height, length, unit, description
+                SELECT cp_id,
+                       name,
+                       width,
+                       height,
+                       length,
+                       unit,
+                       description
                 FROM component
                 WHERE name = ?
-                AND width = ?
-                AND height = ?
-                AND length = ?
+                AND length >= ?
+                ORDER BY length
+                LIMIT 1
                 """;
 
         try (Connection connection = connectionPool.getConnection();
              PreparedStatement ps = connection.prepareStatement(sql)) {
 
             ps.setString(1, name);
-            ps.setDouble(2, width);
-            ps.setDouble(3, height);
-            ps.setDouble(4, length);
+            ps.setDouble(2, requiredLength);
 
             ResultSet rs = ps.executeQuery();
 
@@ -35,14 +43,22 @@ public class ComponentMapper {
                 return mapComponent(rs);
             }
 
-            throw new DatabaseException("Component not found");
+            throw new DatabaseException(
+                    "No suitable component found for: " + name
+            );
 
         } catch (SQLException e) {
-            throw new DatabaseException("Error finding component", e.getMessage());
+
+            throw new DatabaseException(
+                    "Error finding component",
+                    e.getMessage()
+            );
         }
     }
 
-    private static Component mapComponent(ResultSet rs) throws SQLException {
+    private static Component mapComponent(ResultSet rs)
+            throws SQLException {
+
         Component component = new Component();
 
         component.setId(rs.getInt("cp_id"));
