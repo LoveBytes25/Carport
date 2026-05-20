@@ -19,15 +19,13 @@ public class MaterialCalculationService {
 
     private final ConnectionPool connectionPool;
 
-    public MaterialCalculationService(ConnectionPool connectionPool) {
+    public MaterialCalculationService(
+            ConnectionPool connectionPool) {
 
         this.connectionPool = connectionPool;
     }
 
-    public List<CarportComponent> calculate(
-            double carportLength,
-            double carportWidth)
-            throws DatabaseException {
+    public List<CarportComponent> calculate(double carportLength, double carportWidth, String roofType, double roofAngle) throws DatabaseException {
 
         List<CarportComponent> bom = new ArrayList<>();
 
@@ -38,6 +36,8 @@ public class MaterialCalculationService {
         calculateRafters(
                 carportLength,
                 carportWidth,
+                roofType,
+                roofAngle,
                 bom
         );
 
@@ -58,10 +58,7 @@ public class MaterialCalculationService {
         return bom;
     }
 
-    private void calculatePosts(
-            double carportLength,
-            List<CarportComponent> bom)
-            throws DatabaseException {
+    private void calculatePosts(double carportLength, List<CarportComponent> bom) throws DatabaseException {
 
         int quantity =
                 MaterialRuleUtil
@@ -80,7 +77,7 @@ public class MaterialCalculationService {
                 MaterialOptimizer
                         .findBestCombination(
                                 stock,
-                                300
+                                3000
                         );
 
         for (Component component : selection.getComponents()) {
@@ -91,7 +88,9 @@ public class MaterialCalculationService {
 
             row.setQuantity(quantity);
 
-            row.setDescription("Stolper nedgraves 90 cm i jord");
+            row.setDescription(
+                    "Stolper nedgraves 90 cm i jord"
+            );
 
             bom.add(row);
         }
@@ -127,13 +126,33 @@ public class MaterialCalculationService {
         }
     }
 
-    private void calculateRafters(double carportLength, double carportWidth, List<CarportComponent> bom) throws DatabaseException {
+    private void calculateRafters(double carportLength, double carportWidth, String roofType, double roofAngle, List<CarportComponent> bom) throws DatabaseException {
 
         int quantity =
                 MaterialRuleUtil
                         .calculateRafterQuantity(
                                 carportLength
                         );
+
+        double requiredLength;
+
+        if (roofType.equals("flat")) {
+
+            requiredLength =
+                    MaterialRuleUtil
+                            .calculateFlatRafterLength(
+                                    carportWidth
+                            );
+        }
+        else {
+
+            requiredLength =
+                    MaterialRuleUtil
+                            .calculatePitchedRafterLength(
+                                    carportWidth,
+                                    roofAngle
+                            );
+        }
 
         List<Component> stock =
                 ComponentMapper
@@ -146,7 +165,7 @@ public class MaterialCalculationService {
                 MaterialOptimizer
                         .findBestCombination(
                                 stock,
-                                carportWidth
+                                requiredLength
                         );
 
         for (Component component : selection.getComponents()) {
