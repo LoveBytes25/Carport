@@ -10,9 +10,29 @@ public class MaterialRuleUtil {
         return ((int) Math.ceil(carportLength / 300.0) + 1) * 2;
     }
 
+    public static double calculatePostLength() {
+
+        return 300;
+    }
+
+    public static int calculateBeamQuantity() {
+
+        return 2;
+    }
+
+    public static double calculateBeamLength(double carportLength) {
+
+        return carportLength;
+    }
+
     public static int calculateRafterQuantity(double carportLength) {
 
         return (int) Math.ceil(carportLength / 55.0);
+    }
+
+    public static double calculateRafterLength(double carportWidth) {
+
+        return carportWidth;
     }
 
     public static int calculateRoofSheetQuantity(double carportWidth) {
@@ -20,8 +40,8 @@ public class MaterialRuleUtil {
         return (int) Math.ceil(carportWidth / 100.0);
     }
 
-    public static int calculateBeamQuantity() {
+    public static double calculateRoofSheetLength(double carportLength) {
 
-        return 2;
+        return carportLength;
     }
 }
