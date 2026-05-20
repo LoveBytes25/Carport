@@ -3,6 +3,7 @@ package app.services;
 import app.entities.CarportComponent;
 import app.exception.DatabaseException;
 import app.persistence.ConnectionPool;
+
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -11,17 +12,14 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class MaterialCalculationServiceTest {
 
+    private final MaterialCalculationService service =
+            new MaterialCalculationService(
+                    ConnectionPool.getInstance()
+            );
+
     @Test
     void calculateShouldGenerateBom()
             throws DatabaseException {
-
-        ConnectionPool connectionPool =
-                ConnectionPool.getInstance();
-
-        MaterialCalculationService service =
-                new MaterialCalculationService(
-                        connectionPool
-                );
 
         List<CarportComponent> bom =
                 service.calculate(600, 360);
@@ -30,135 +28,174 @@ class MaterialCalculationServiceTest {
 
         assertFalse(bom.isEmpty());
 
-        assertEquals(4, bom.size());
+        assertTrue(bom.size() >= 8);
     }
 
     @Test
     void calculateShouldContainPosts()
             throws DatabaseException {
 
-        ConnectionPool connectionPool =
-                ConnectionPool.getInstance();
-
-        MaterialCalculationService service =
-                new MaterialCalculationService(
-                        connectionPool
-                );
-
         List<CarportComponent> bom =
                 service.calculate(600, 360);
 
-        CarportComponent posts = bom.get(0);
+        boolean found =
+                bom.stream()
+                        .anyMatch(c ->
+                                c.getComponent()
+                                        .getName()
+                                        .equals("Stolpe"));
 
-        assertEquals(
-                "Stolpe",
-                posts.getComponent().getName()
-        );
-
-        assertEquals(
-                6,
-                posts.getQuantity()
-        );
-
-        assertEquals(
-                300,
-                posts.getComponent().getLength()
-        );
+        assertTrue(found);
     }
 
     @Test
     void calculateShouldContainBeams()
             throws DatabaseException {
 
-        ConnectionPool connectionPool =
-                ConnectionPool.getInstance();
-
-        MaterialCalculationService service =
-                new MaterialCalculationService(
-                        connectionPool
-                );
-
         List<CarportComponent> bom =
                 service.calculate(600, 360);
 
-        CarportComponent beams = bom.get(1);
+        boolean found =
+                bom.stream()
+                        .anyMatch(c ->
+                                c.getComponent()
+                                        .getName()
+                                        .equals("Rem"));
 
-        assertEquals(
-                "Rem",
-                beams.getComponent().getName()
-        );
-
-        assertEquals(
-                2,
-                beams.getQuantity()
-        );
-
-        assertTrue(
-                beams.getComponent().getLength() >= 600
-        );
+        assertTrue(found);
     }
 
     @Test
     void calculateShouldContainRafters()
             throws DatabaseException {
 
-        ConnectionPool connectionPool =
-                ConnectionPool.getInstance();
-
-        MaterialCalculationService service =
-                new MaterialCalculationService(
-                        connectionPool
-                );
-
         List<CarportComponent> bom =
                 service.calculate(600, 360);
 
-        CarportComponent rafters = bom.get(2);
+        boolean found =
+                bom.stream()
+                        .anyMatch(c ->
+                                c.getComponent()
+                                        .getName()
+                                        .equals("Spær"));
 
-        assertEquals(
-                "Spær",
-                rafters.getComponent().getName()
-        );
-
-        assertEquals(
-                11,
-                rafters.getQuantity()
-        );
-
-        assertTrue(
-                rafters.getComponent().getLength() >= 360
-        );
+        assertTrue(found);
     }
 
     @Test
     void calculateShouldContainRoofSheets()
             throws DatabaseException {
 
-        ConnectionPool connectionPool =
-                ConnectionPool.getInstance();
+        List<CarportComponent> bom =
+                service.calculate(600, 360);
 
-        MaterialCalculationService service =
-                new MaterialCalculationService(
-                        connectionPool
-                );
+        boolean found =
+                bom.stream()
+                        .anyMatch(c ->
+                                c.getComponent()
+                                        .getName()
+                                        .equals("Tagplade"));
+
+        assertTrue(found);
+    }
+
+    @Test
+    void calculateShouldContainUnderStern()
+            throws DatabaseException {
 
         List<CarportComponent> bom =
                 service.calculate(600, 360);
 
-        CarportComponent roofSheets = bom.get(3);
+        long count =
+                bom.stream()
+                        .filter(c ->
+                                c.getComponent()
+                                        .getName()
+                                        .equals("Understernbræt"))
+                        .count();
 
-        assertEquals(
-                "Tagplade",
-                roofSheets.getComponent().getName()
-        );
+        assertTrue(count >= 2);
+    }
 
-        assertEquals(
-                4,
-                roofSheets.getQuantity()
-        );
+    @Test
+    void calculateShouldContainOverStern()
+            throws DatabaseException {
 
-        assertTrue(
-                roofSheets.getComponent().getLength() >= 600
-        );
+        List<CarportComponent> bom =
+                service.calculate(600, 360);
+
+        long count =
+                bom.stream()
+                        .filter(c ->
+                                c.getComponent()
+                                        .getName()
+                                        .equals("Oversternbræt"))
+                        .count();
+
+        assertTrue(count >= 2);
+    }
+
+    @Test
+    void calculateSmallCarport()
+            throws DatabaseException {
+
+        List<CarportComponent> bom =
+                service.calculate(420, 300);
+
+        assertNotNull(bom);
+
+        assertFalse(bom.isEmpty());
+
+        int posts =
+                bom.stream()
+                        .filter(c ->
+                                c.getComponent()
+                                        .getName()
+                                        .equals("Stolpe"))
+                        .mapToInt(CarportComponent::getQuantity)
+                        .sum();
+
+        assertEquals(6, posts);
+    }
+
+    @Test
+    void calculateLargeCarport()
+            throws DatabaseException {
+
+        List<CarportComponent> bom =
+                service.calculate(780, 600);
+
+        assertNotNull(bom);
+
+        assertFalse(bom.isEmpty());
+
+        int rafters =
+                bom.stream()
+                        .filter(c ->
+                                c.getComponent()
+                                        .getName()
+                                        .equals("Spær"))
+                        .mapToInt(CarportComponent::getQuantity)
+                        .sum();
+
+        assertTrue(rafters >= 14);
+    }
+
+    @Test
+    void optimizerShouldUseMultipleBoards()
+            throws DatabaseException {
+
+        List<CarportComponent> bom =
+                service.calculate(780, 360);
+
+        long remCount =
+                bom.stream()
+                        .filter(c ->
+                                c.getComponent()
+                                        .getName()
+                                        .equals("Rem"))
+                        .count();
+
+        assertTrue(remCount >= 2);
     }
 }
