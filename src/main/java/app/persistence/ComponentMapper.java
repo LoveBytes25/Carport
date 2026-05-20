@@ -13,11 +13,7 @@ import java.util.List;
 
 public class ComponentMapper {
 
-    public static List<Component>
-    findComponentsByName(
-            String name,
-            ConnectionPool connectionPool)
-            throws DatabaseException {
+    public static List<Component> findComponentsByName(String name, ConnectionPool connectionPool) throws DatabaseException {
 
         String sql = """
                 SELECT cp_id,
@@ -32,79 +28,50 @@ public class ComponentMapper {
                 ORDER BY length ASC
                 """;
 
-        try (Connection connection =
-                     connectionPool.getConnection();
+        try (Connection connection = connectionPool.getConnection();
 
-             PreparedStatement ps =
-                     connection.prepareStatement(sql)) {
+             PreparedStatement ps = connection.prepareStatement(sql)) {
 
             ps.setString(1, name);
 
             ResultSet rs = ps.executeQuery();
 
-            List<Component> components =
-                    new ArrayList<>();
+            List<Component> components = new ArrayList<>();
 
             while (rs.next()) {
-
-                components.add(
-                        mapComponent(rs)
-                );
+                components.add(mapComponent(rs));
             }
 
             if (components.isEmpty()) {
 
-                throw new DatabaseException(
-                        "No components found for: "
-                                + name
-                );
+                throw new DatabaseException("No components found: " + name);
             }
 
             return components;
 
         } catch (SQLException e) {
 
-            throw new DatabaseException(
-                    "Error finding components",
-                    e.getMessage()
-            );
+            throw new DatabaseException("Error finding components", e.getMessage());
         }
     }
 
-    private static Component mapComponent(
-            ResultSet rs)
-            throws SQLException {
+    private static Component mapComponent(ResultSet rs) throws SQLException {
 
-        Component component =
-                new Component();
+        Component component = new Component();
 
-        component.setId(
-                rs.getInt("cp_id")
-        );
+        component.setId(rs.getInt("cp_id"));
 
-        component.setName(
-                rs.getString("name")
-        );
+        component.setName(rs.getString("name"));
 
-        component.setWidth(
-                rs.getDouble("width")
-        );
+        component.setWidth(rs.getDouble("width"));
 
-        component.setHeight(
-                rs.getDouble("height")
-        );
+        component.setHeight(rs.getDouble("height"));
 
-        component.setLength(
-                rs.getDouble("length")
-        );
+        component.setLength(rs.getDouble("length"));
 
-        component.setUnit(
-                rs.getString("unit")
-        );
+        component.setUnit(rs.getString("unit"));
 
-        component.setDescription(
-                rs.getString("description")
-        );
+        component.setDescription(rs.getString("description"));
 
         return component;
     }
