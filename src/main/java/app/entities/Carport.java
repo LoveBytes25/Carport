@@ -3,11 +3,11 @@ package app.entities;
 import java.time.LocalDateTime;
 
 public class Carport {
-    int id;
-    Double height;
-    Double width;
-    Double length;
-    LocalDateTime timestamp;
+    private int id;
+    private Double height;
+    private Double width;
+    private Double length;
+    private LocalDateTime timestamp;
 
     public Carport(int id, Double height, Double width, Double length, LocalDateTime timestamp) {
         this.id = id;

@@ -1,24 +1,35 @@
 package app.entities;
 
 public class Component {
-    int id;
-    String name;
-    Double width;
-    Double height;
-    String unit;
-    String description;
 
-    public Component(int id, String name, Double width, Double height, String unit, String description) {
+    private int id;
+    private String name;
+    private Double width;
+    private Double height;
+    private Double length;
+    private String unit;
+    private String description;
+
+    public Component() {
+    }
+
+    public Component(int id, String name, Double width, Double height, Double length, String unit, String description) {
+
         this.id = id;
         this.name = name;
         this.width = width;
         this.height = height;
+        this.length = length;
         this.unit = unit;
         this.description = description;
     }
 
     public int getId() {
         return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 
     public String getName() {
@@ -43,6 +54,14 @@ public class Component {
 
     public void setHeight(Double height) {
         this.height = height;
+    }
+
+    public Double getLength() {
+        return length;
+    }
+
+    public void setLength(Double length) {
+        this.length = length;
     }
 
     public String getUnit() {
