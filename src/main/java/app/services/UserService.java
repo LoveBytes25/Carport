@@ -3,7 +3,7 @@ package app.services;
 import app.entities.User;
 import app.exceptions.DatabaseException;
 import app.persistence.UserMapper;
-import app.persistence.ConnectionPool;
+import app.config.ConnectionPool;
 
 public class UserService {
 

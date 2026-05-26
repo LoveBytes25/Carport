@@ -2,8 +2,8 @@ package app.services;
 
 import app.entities.CarportComponent;
 import app.entities.Component;
-import app.exception.DatabaseException;
-import app.persistence.ConnectionPool;
+import app.exceptions.DatabaseException;
+import app.config.ConnectionPool;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;

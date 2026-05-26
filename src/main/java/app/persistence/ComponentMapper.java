@@ -1,7 +1,8 @@
 package app.persistence;
 
+import app.config.ConnectionPool;
 import app.entities.Component;
-import app.exception.DatabaseException;
+import app.exceptions.DatabaseException;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;

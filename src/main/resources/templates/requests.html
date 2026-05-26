@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="da" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Salgsperson – Fog</title>
+    <link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --navy:      #1b3a5c;
+            --navy-dark: #122840;
+            --blue:      #2a56a4;
+            --blue-hover:#1e4080;
+            --blue-light:#e8eef8;
+            --red:       #c0392b;
+            --green:     #27ae60;
+            --orange:    #e67e22;
+            --bg:        #f2f3f5;
+            --white:     #ffffff;
+            --border:    #d4d4d0;
+            --text:      #1a1a1a;
+            --muted:     #666;
+            --light:     #999;
+            --r:         3px;
+            --r-lg:      6px;
+            --ease:      0.18s ease;
+        }
+
+        body {
+            font-family: 'Source Sans 3', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        /* ── NAV ── */
+        nav {
+            background: var(--navy);
+            height: 54px;
+            display: flex;
+            align-items: center;
+            padding: 0 24px;
+            gap: 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.25);
+        }
+
+        .nav-logo {
+            background: var(--blue);
+            color: #fff;
+            font-size: 18px;
+            font-weight: 700;
+            width: 46px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 2px;
+            text-decoration: none;
+            margin-right: 28px;
+            flex-shrink: 0;
+        }
+
+        .nav-links { display: flex; gap: 0; flex: 1; }
+
+        .nav-links a {
+            color: rgba(255,255,255,0.82);
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 500;
+            padding: 0 14px;
+            height: 54px;
+            display: flex;
+            align-items: center;
+            border-bottom: 2px solid transparent;
+            transition: var(--ease);
+        }
+
+        .nav-links a:hover { color: #fff; background: rgba(255,255,255,0.06); }
+        .nav-links a.active { color: #fff; border-bottom-color: var(--blue); }
+
+        .nav-right {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 13px;
+            color: rgba(255,255,255,0.8);
+        }
+
+        .nav-user {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            padding: 5px 12px;
+            background: rgba(255,255,255,0.1);
+            border-radius: var(--r);
+        }
+
+        .nav-user svg { width: 16px; height: 16px; stroke: currentColor; fill: none; stroke-width: 1.8; }
+
+        .nav-logout {
+            color: rgba(255,255,255,0.7);
+            text-decoration: none;
+            font-size: 12px;
+            padding: 5px 10px;
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: var(--r);
+            transition: var(--ease);
+        }
+
+        .nav-logout:hover { background: rgba(255,255,255,0.1); color: #fff; }
+
+        /* ── PAGE ── */
+        .page {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 28px 24px 60px;
+        }
+
+        /* ── PAGE HEADER ── */
+        .page-header {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            margin-bottom: 24px;
+            gap: 16px;
+        }
+
+        .page-header h1 {
+            font-size: 22px;
+            font-weight: 700;
+            color: var(--navy-dark);
+        }
+
+        .page-header p {
+            font-size: 13px;
+            color: var(--muted);
+            margin-top: 3px;
+        }
+
+        /* ── STATS ROW ── */
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+
+        .stat-card {
+            background: var(--white);
+            border: 1px solid var(--border);
+            border-radius: var(--r-lg);
+            padding: 14px 16px;
+        }
+
+        .stat-label {
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.07em;
+            color: var(--light);
+            margin-bottom: 4px;
+        }
+
+        .stat-value {
+            font-size: 26px;
+            font-weight: 700;
+            color: var(--navy);
+        }
+
+        .stat-value.orange { color: var(--orange); }
+        .stat-value.green  { color: var(--green); }
+        .stat-value.red    { color: var(--red); }
+
+        /* ── FILTER BAR ── */
+        .filter-bar {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 14px;
+            flex-wrap: wrap;
+        }
+
+        .filter-bar label {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--muted);
+        }
+
+        .filter-bar select,
+        .filter-bar input {
+            border: 1px solid var(--border);
+            border-radius: var(--r);
+            padding: 6px 10px;
+            font-size: 13px;
+            font-family: inherit;
+            background: var(--white);
+            color: var(--text);
+            outline: none;
+        }
+
+        .filter-bar select:focus,
+        .filter-bar input:focus {
+            border-color: var(--blue);
+        }
+
+        /* ── TABLE ── */
+        .table-wrap {
+            background: var(--white);
+            border: 1px solid var(--border);
+            border-radius: var(--r-lg);
+            overflow: hidden;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        thead {
+            background: var(--navy);
+            color: #fff;
+        }
+
+        thead th {
+            padding: 11px 14px;
+            text-align: left;
+            font-size: 11.5px;
+            font-weight: 600;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+            white-space: nowrap;
+        }
+
+        tbody tr {
+            border-bottom: 1px solid var(--border);
+            transition: background var(--ease);
+            cursor: pointer;
+        }
+
+        tbody tr:last-child { border-bottom: none; }
+        tbody tr:hover { background: var(--blue-light); }
+
+        tbody td {
+            padding: 11px 14px;
+            font-size: 13.5px;
+            vertical-align: middle;
+        }
+
+        .td-id {
+            font-weight: 700;
+            color: var(--navy);
+            font-size: 13px;
+        }
+
+        .td-name { font-weight: 600; }
+
+        .td-dims {
+            font-size: 12.5px;
+            color: var(--muted);
+            white-space: nowrap;
+        }
+
+        /* Status badges */
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 3px 9px;
+            border-radius: 20px;
+            font-size: 11.5px;
+            font-weight: 700;
+            white-space: nowrap;
+        }
+
+        .badge-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+
+        .badge.pending  { background: #fff3e0; color: #e67e22; }
+        .badge.pending .badge-dot  { background: #e67e22; }
+        .badge.sent     { background: #e3f2fd; color: #1976d2; }
+        .badge.sent .badge-dot     { background: #1976d2; }
+        .badge.accepted { background: #e8f5e9; color: #27ae60; }
+        .badge.accepted .badge-dot { background: #27ae60; }
+        .badge.rejected { background: #fdecea; color: #c0392b; }
+        .badge.rejected .badge-dot { background: #c0392b; }
+
+        /* Flag badge */
+        .flag {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 11.5px;
+            font-weight: 700;
+            color: var(--red);
+            background: #fdecea;
+            padding: 3px 8px;
+            border-radius: 20px;
+        }
+
+        .flag svg { width: 11px; height: 11px; stroke: currentColor; fill: none; stroke-width: 2; }
+
+        /* Action buttons */
+        .btn-view {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            background: var(--blue);
+            color: #fff;
+            border: none;
+            border-radius: var(--r);
+            padding: 6px 12px;
+            font-size: 12.5px;
+            font-weight: 600;
+            font-family: inherit;
+            cursor: pointer;
+            text-decoration: none;
+            transition: background var(--ease);
+            white-space: nowrap;
+        }
+
+        .btn-view:hover { background: var(--blue-hover); }
+        .btn-view svg { width: 13px; height: 13px; stroke: currentColor; fill: none; stroke-width: 2.2; }
+
+        /* Empty state */
+        .empty {
+            text-align: center;
+            padding: 48px 24px;
+            color: var(--light);
+        }
+
+        .empty svg { width: 40px; height: 40px; stroke: var(--light); fill: none; stroke-width: 1.4; margin-bottom: 12px; }
+        .empty p { font-size: 14px; }
+
+        /* Pagination */
+        .pagination {
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            gap: 6px;
+            margin-top: 16px;
+        }
+
+        .page-btn {
+            border: 1px solid var(--border);
+            background: var(--white);
+            border-radius: var(--r);
+            padding: 5px 11px;
+            font-size: 13px;
+            font-family: inherit;
+            cursor: pointer;
+            color: var(--text);
+            transition: var(--ease);
+        }
+
+        .page-btn:hover  { background: var(--blue-light); border-color: var(--blue); }
+        .page-btn.active { background: var(--blue); color: #fff; border-color: var(--blue); }
+        .page-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+    </style>
+</head>
+<body>
+
+<!-- ── NAV ── -->
+<nav>
+    <a class="nav-logo" href="/">Fog</a>
+    <div class="nav-links">
+        <a href="#" class="active">Forespørgsler</a>
+        <a href="/salesperson/orders">Ordrer</a>
+        <a href="/admin/materials">Materialer</a>
+    </div>
+    <div class="nav-right">
+        <div class="nav-user">
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+            <!--/* Show logged-in salesperson's email */-->
+            <span th:text="${session.user != null ? session.user.email : 'Salgsperson'}">
+        salgsperson@fog.dk
+      </span>
+        </div>
+        <a class="nav-logout" href="/logout">Log ud</a>
+    </div>
+</nav>
+
+<!-- ── PAGE ── -->
+<div class="page">
+
+    <!-- PAGE HEADER -->
+    <div class="page-header">
+        <div>
+            <h1>Forespørgsler</h1>
+            <p>Oversigt over alle indkomne carport-forespørgsler</p>
+        </div>
+    </div>
+
+    <!-- STATS ROW -->
+    <!--
+      Controller passes:
+        totalCount    → total requests
+        pendingCount  → status = PENDING
+        sentCount     → status = SENT
+        acceptedCount → status = ACCEPTED
+    -->
+    <div class="stats">
+        <div class="stat-card">
+            <div class="stat-label">Total</div>
+            <div class="stat-value" th:text="${totalCount}">24</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">Afventer</div>
+            <div class="stat-value orange" th:text="${pendingCount}">8</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">Tilbud sendt</div>
+            <div class="stat-value" th:text="${sentCount}">12</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">Accepteret</div>
+            <div class="stat-value green" th:text="${acceptedCount}">4</div>
+        </div>
+    </div>
+
+    <!-- FILTER BAR -->
+    <div class="filter-bar">
+        <label>Status:</label>
+        <select id="statusFilter" onchange="filterTable()">
+            <option value="all">Alle</option>
+            <option value="PENDING">Afventer</option>
+            <option value="SENT">Tilbud sendt</option>
+            <option value="ACCEPTED">Accepteret</option>
+            <option value="REJECTED">Afvist</option>
+        </select>
+        <label>Søg:</label>
+        <input type="text" id="searchInput"
+               placeholder="Navn, email eller #ID..."
+               oninput="filterTable()"/>
+    </div>
+
+    <!-- REQUESTS TABLE -->
+    <div class="table-wrap">
+        <!--
+          requests is a List<RequestSummaryDTO> passed by the controller.
+          Each entry contains:
+            rqId, createdAt, status, flagged,
+            firstName, lastName, email, phone,
+            carpWidth, carpLength, roofTypeName, hasShed
+        -->
+        <table id="requestTable">
+            <thead>
+            <tr>
+                <th>#ID</th>
+                <th>Dato</th>
+                <th>Kunde</th>
+                <th>Email</th>
+                <th>Carport</th>
+                <th>Tagtype</th>
+                <th>Skur</th>
+                <th>Status</th>
+                <th></th>
+            </tr>
+            </thead>
+            <tbody>
+            <!-- Thymeleaf: iterate over requests list -->
+            <tr th:each="req : ${requests}"
+                th:data-status="${req.status}"
+                th:data-search="${req.firstName + ' ' + req.lastName + ' ' + req.email + ' ' + req.rqId}"
+                th:onclick="|window.location='/salesperson/request/${req.rqId}'|">
+
+                <td class="td-id" th:text="'#' + ${req.rqId}">#42</td>
+
+                <td th:text="${#temporals.format(req.createdAt, 'dd/MM/yyyy')}">
+                    12/05/2025
+                </td>
+
+                <td class="td-name"
+                    th:text="${req.firstName + ' ' + req.lastName}">
+                    Anders Nielsen
+                </td>
+
+                <td th:text="${req.email}">anders@email.dk</td>
+
+                <td class="td-dims"
+                    th:text="${req.carpWidth + ' × ' + req.carpLength + ' cm'}">
+                    330 × 500 cm
+                </td>
+
+                <td th:text="${req.roofTypeName}">Plastmo Ecolite</td>
+
+                <td>
+                    <span th:if="${req.hasShed}"  style="color:var(--green);font-weight:600;font-size:12px;">Ja</span>
+                    <span th:unless="${req.hasShed}" style="color:var(--light);font-size:12px;">Nej</span>
+                </td>
+
+                <td>
+                    <!-- Flag indicator -->
+                    <span th:if="${req.flagged}" class="flag">
+              <svg viewBox="0 0 24 24"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg>
+              Flag
+            </span>
+                    <!-- Status badge -->
+                    <span th:switch="${req.status}">
+              <span th:case="'PENDING'"  class="badge pending"><span class="badge-dot"></span>Afventer</span>
+              <span th:case="'SENT'"     class="badge sent"><span class="badge-dot"></span>Sendt</span>
+              <span th:case="'ACCEPTED'" class="badge accepted"><span class="badge-dot"></span>Accepteret</span>
+              <span th:case="'REJECTED'" class="badge rejected"><span class="badge-dot"></span>Afvist</span>
+              <span th:case="*"          class="badge pending"><span class="badge-dot"></span>Ukendt</span>
+            </span>
+                </td>
+
+                <td onclick="event.stopPropagation()">
+                    <a class="btn-view"
+                       th:href="@{/salesperson/request/{id}(id=${req.rqId})}">
+                        Se
+                        <svg viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+                    </a>
+                </td>
+            </tr>
+
+            <!-- Empty state if no requests -->
+            <tr th:if="${#lists.isEmpty(requests)}">
+                <td colspan="9">
+                    <div class="empty">
+                        <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                        <p>Ingen forespørgsler at vise</p>
+                    </div>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- PAGINATION placeholder -->
+    <div class="pagination">
+        <button class="page-btn" disabled>← Forrige</button>
+        <button class="page-btn active">1</button>
+        <button class="page-btn">2</button>
+        <button class="page-btn">Næste →</button>
+    </div>
+
+</div>
+
+<!-- ── JS: client-side filter ── -->
+<script>
+    function filterTable() {
+        const status = document.getElementById('statusFilter').value;
+        const search = document.getElementById('searchInput').value.toLowerCase();
+        const rows   = document.querySelectorAll('#requestTable tbody tr[data-status]');
+
+        rows.forEach(row => {
+            const rowStatus = row.dataset.status || '';
+            const rowSearch = (row.dataset.search || '').toLowerCase();
+            const matchStatus = status === 'all' || rowStatus === status;
+            const matchSearch = search === '' || rowSearch.includes(search);
+            row.style.display = matchStatus && matchSearch ? '' : 'none';
+        });
+    }
+</script>
+
+</body>
+</html>
