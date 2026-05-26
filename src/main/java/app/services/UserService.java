@@ -2,8 +2,10 @@ package app.services;
 
 import app.entities.User;
 import app.exceptions.DatabaseException;
+import app.persistence.ConnectionPool;
 import app.persistence.UserMapper;
-import app.config.ConnectionPool;
+import app.util.PasswordHasher;
+import app.util.Validator;
 
 public class UserService {
 
@@ -16,8 +18,8 @@ public class UserService {
     // REGISTER
     public void register(User user) throws DatabaseException {
 
-        ValidationUtil.validateEmail(user.getEmail());
-        ValidationUtil.validatePassword(user.getPassword());
+        Validator.validateEmail(user.getEmail());
+        Validator.validatePassword(user.getPassword());
 
         String hashedPassword = PasswordHasher.hash(user.getPassword());
         user.setPassword(hashedPassword);

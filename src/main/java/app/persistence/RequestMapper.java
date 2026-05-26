@@ -1,7 +1,6 @@
 package app.persistence;
 
 import app.dtos.RequestSummaryDTO;
-import app.config.ConnectionPool;
 
 import java.sql.*;
 import java.util.ArrayList;

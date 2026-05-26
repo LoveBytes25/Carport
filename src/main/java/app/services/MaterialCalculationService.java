@@ -7,8 +7,8 @@ import app.entities.MaterialSelection;
 import app.exceptions.DatabaseException;
 
 import app.persistence.ComponentMapper;
-import app.config.ConnectionPool;
 
+import app.persistence.ConnectionPool;
 import app.util.MaterialOptimizer;
 import app.util.MaterialRuleUtil;
 

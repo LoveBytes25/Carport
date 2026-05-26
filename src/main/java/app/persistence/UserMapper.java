@@ -3,7 +3,6 @@ package app.persistence;
 import app.entities.User;
 import app.entities.Role;
 import app.exceptions.DatabaseException;
-import app.config.ConnectionPool;
 
 import java.sql.*;
 import java.util.ArrayList;

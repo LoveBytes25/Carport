@@ -3,7 +3,7 @@ package app.services;
 import app.entities.CarportComponent;
 import app.entities.Component;
 import app.exceptions.DatabaseException;
-import app.config.ConnectionPool;
+import app.persistence.ConnectionPool;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;

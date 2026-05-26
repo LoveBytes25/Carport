@@ -1,6 +1,5 @@
 package app.persistence;
 
-import app.config.ConnectionPool;
 import app.entities.Component;
 import app.exceptions.DatabaseException;
 
