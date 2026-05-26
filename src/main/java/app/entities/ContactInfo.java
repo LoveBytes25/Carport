@@ -7,14 +7,16 @@ public class ContactInfo {
     String address;
     String phone;
     String email;
+    Zip zip;
 
-    public ContactInfo(int id, String firstName, String lastName, String address, String phone, String email) {
+    public ContactInfo(int id, String firstName, String lastName, String address, String phone, String email, Zip zip) {
         this.id = id;
         this.firstName = firstName;
         this.lastName = lastName;
         this.address = address;
         this.phone = phone;
         this.email = email;
+        this.zip = zip;
     }
 
     public int getId() {
@@ -59,5 +61,9 @@ public class ContactInfo {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 }
