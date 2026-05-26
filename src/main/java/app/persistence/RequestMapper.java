@@ -1,6 +1,6 @@
 package app.persistence;
 
-import app.config.ConnectionPool;
+import app.persistence.ConnectionPool;
 import app.dtos.RequestSummaryDTO;
 import app.entities.*;
 import app.exceptions.DatabaseException;
