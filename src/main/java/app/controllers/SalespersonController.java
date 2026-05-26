@@ -1,50 +1,34 @@
 package app.controllers;
 
 import app.config.ThymeleafConfig;
-import app.persistence.RequestMapper;
 import app.dtos.RequestSummaryDTO;
 import app.entities.User;
+import app.exceptions.DatabaseException;
+import app.persistence.RequestMapper;
 import io.javalin.Javalin;
 import io.javalin.http.Context;
 import org.thymeleaf.TemplateEngine;
-import org.thymeleaf.context.WebContext;
-
 
 import java.sql.SQLException;
 import java.util.List;
 
-/**
- * SalespersonController handles the salesperson-facing pages.
- *
- * Routes:
- *   GET /salesperson/requests        → overview list of all requests
- *   GET /salesperson/request/{id}    → detail view for one request (to add later)
- *
- * ERD tables used:
- *   request       → rq_id, carp_id, ci_id, created_at, status
- *   carport       → width, length, rt_id
- *   roof_type     → name
- *   contact_info  → first_name, last_name, email, phone
- *   shed          → exists for carp_id? → hasShed flag
- */
 public class SalespersonController {
 
     private final TemplateEngine templateEngine;
-    private final RequestMapper requestMapper;
+    private final RequestMapper  requestMapper;
 
     public SalespersonController(TemplateEngine templateEngine,
-                                 RequestMapper requestMapper) {
+                                 RequestMapper  requestMapper) {
         this.templateEngine = templateEngine;
-        this.requestMapper = requestMapper;
+        this.requestMapper  = requestMapper;
     }
 
     public void register(Javalin app) {
-        app.get("/salesperson/requests",      this::showRequests);
-        app.get("/salesperson/request/{id}",  this::showRequestDetail);
+        app.get("/salesperson/requests",     this::showRequests);
+        app.get("/salesperson/request/{id}", this::showRequestDetail);
     }
 
-    private void showRequests(Context ctx) throws SQLException {
-
+    private void showRequests(Context ctx) throws SQLException, DatabaseException {
         User user = ctx.sessionAttribute("user");
         if (user == null) {
             ctx.redirect("/login");
@@ -58,14 +42,15 @@ public class SalespersonController {
         long sent     = requests.stream().filter(r -> "SENT".equals(r.getStatus())).count();
         long accepted = requests.stream().filter(r -> "ACCEPTED".equals(r.getStatus())).count();
 
-        WebContext webCtx = ThymeleafConfig.buildWebContext(ctx);
-        webCtx.setVariable("requests",      requests);
-        webCtx.setVariable("totalCount",    total);
-        webCtx.setVariable("pendingCount",  pending);
-        webCtx.setVariable("sentCount",     sent);
-        webCtx.setVariable("acceptedCount", accepted);
+        org.thymeleaf.context.Context thymeleafCtx = new org.thymeleaf.context.Context();
+        thymeleafCtx.setVariable("requests",      requests);
+        thymeleafCtx.setVariable("totalCount",    total);
+        thymeleafCtx.setVariable("pendingCount",  pending);
+        thymeleafCtx.setVariable("sentCount",     sent);
+        thymeleafCtx.setVariable("acceptedCount", accepted);
+        thymeleafCtx.setVariable("user",          user);
 
-        String html = templateEngine.process("salesperson-requests", webCtx);
+        String html = templateEngine.process("requests", thymeleafCtx);
         ctx.html(html);
     }
 
@@ -78,7 +63,7 @@ public class SalespersonController {
 
         int rqId = Integer.parseInt(ctx.pathParam("id"));
 
-
+        // Skal tilføje
         ctx.result("Detail view for request #" + rqId + " — coming soon");
     }
 }
