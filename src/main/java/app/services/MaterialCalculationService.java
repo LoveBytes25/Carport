@@ -4,10 +4,10 @@ import app.entities.CarportComponent;
 import app.entities.Component;
 import app.entities.MaterialSelection;
 
-import app.exception.DatabaseException;
+import app.exceptions.DatabaseException;
 
 import app.persistence.ComponentMapper;
-import app.persistence.ConnectionPool;
+import app.config.ConnectionPool;
 
 import app.util.MaterialOptimizer;
 import app.util.MaterialRuleUtil;

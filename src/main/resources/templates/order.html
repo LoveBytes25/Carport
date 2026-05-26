@@ -1,0 +1,1292 @@
+<!DOCTYPE html>
+<html lang="da" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Bestil Quick-Byg tilbud – Fog</title>
+    <link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+    <style>
+        /* ── RESET & BASE ── */
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --navy:       #1b3a5c;
+            --navy-dark:  #122840;
+            --blue:       #2a56a4;
+            --blue-hover: #1e4080;
+            --blue-light: #e8eef8;
+            --red:        #c0392b;
+            --bg:         #f5f5f3;
+            --white:      #ffffff;
+            --border:     #d4d4d0;
+            --text:       #1a1a1a;
+            --muted:      #666;
+            --light:      #999;
+            --input-bg:   #ffffff;
+            --section-bg: #f0f0ec;
+            --toggle-off: #ccc;
+            --r:          3px;
+            --r-lg:       5px;
+            --ease:       0.18s ease;
+        }
+
+        body {
+            font-family: 'Source Sans 3', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            font-size: 14px;
+            line-height: 1.55;
+        }
+
+        /* ── NAV ── */
+        nav {
+            background: var(--navy);
+            height: 54px;
+            display: flex;
+            align-items: center;
+            padding: 0 24px;
+            gap: 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.25);
+        }
+
+        .nav-logo {
+            background: var(--blue);
+            color: #fff;
+            font-size: 18px;
+            font-weight: 700;
+            width: 46px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 2px;
+            text-decoration: none;
+            margin-right: 28px;
+            letter-spacing: -0.5px;
+            flex-shrink: 0;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 0;
+            flex: 1;
+        }
+
+        .nav-links a {
+            color: rgba(255,255,255,0.82);
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 500;
+            padding: 0 12px;
+            height: 54px;
+            display: flex;
+            align-items: center;
+            border-bottom: 2px solid transparent;
+            transition: var(--ease);
+        }
+
+        .nav-links a:hover { color: #fff; background: rgba(255,255,255,0.06); }
+        .nav-links a.active { color: #fff; border-bottom-color: var(--blue); }
+
+        .nav-right {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .nav-icon {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2px;
+            color: rgba(255,255,255,0.8);
+            font-size: 10px;
+            padding: 6px 10px;
+            border-radius: var(--r);
+            cursor: pointer;
+            text-decoration: none;
+            transition: var(--ease);
+            background: none;
+            border: none;
+            font-family: inherit;
+        }
+
+        .nav-icon:hover { color: #fff; background: rgba(255,255,255,0.08); }
+        .nav-icon svg { width: 19px; height: 19px; stroke: currentColor; fill: none; stroke-width: 1.7; }
+
+        /* ── BREADCRUMB ── */
+        .breadcrumb {
+            padding: 10px 24px;
+            font-size: 12px;
+            color: var(--light);
+            display: flex;
+            gap: 5px;
+            align-items: center;
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+
+        .breadcrumb a { color: var(--muted); text-decoration: none; }
+        .breadcrumb a:hover { text-decoration: underline; color: var(--blue); }
+
+        /* ── PAGE LAYOUT ── */
+        .page {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 0 24px 60px;
+            display: grid;
+            grid-template-columns: 1fr 500px;
+            gap: 40px;
+            align-items: start;
+        }
+
+        /* ── LEFT ── */
+        .page-left h1 {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--navy-dark);
+            margin-bottom: 14px;
+            line-height: 1.3;
+        }
+
+        .page-left p {
+            font-size: 13.5px;
+            color: var(--muted);
+            margin-bottom: 8px;
+            line-height: 1.65;
+        }
+
+        /* ── DRAWING CARD ── */
+        .drawing-card {
+            margin-top: 22px;
+            background: var(--white);
+            border: 1px solid var(--border);
+            border-radius: var(--r-lg);
+            overflow: hidden;
+            position: sticky;
+            top: 64px;
+        }
+
+        .drawing-card-header {
+            padding: 9px 14px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid var(--border);
+            background: var(--section-bg);
+        }
+
+        .drawing-card-header span {
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.07em;
+            color: var(--muted);
+        }
+
+        .view-toggle {
+            display: flex;
+            border: 1px solid var(--border);
+            border-radius: var(--r);
+            overflow: hidden;
+            background: var(--white);
+        }
+
+        .view-btn {
+            padding: 4px 13px;
+            font-size: 12px;
+            font-weight: 600;
+            font-family: inherit;
+            cursor: pointer;
+            border: none;
+            background: transparent;
+            color: var(--muted);
+            transition: var(--ease);
+        }
+
+        .view-btn.active { background: var(--navy); color: #fff; }
+        .view-btn:not(.active):hover { background: var(--section-bg); }
+
+        .drawing-area {
+            padding: 14px 16px 10px;
+        }
+
+        .canvas-wrap {
+            background: #f9f9f7;
+            border: 1px solid #e4e4e0;
+            border-radius: 4px;
+            height: 220px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .canvas-wrap svg { width: 100%; height: 100%; display: block; }
+
+        /* Dim badges */
+        .dim-row {
+            display: flex;
+            gap: 8px;
+            margin-top: 10px;
+        }
+
+        .dim-badge {
+            background: var(--section-bg);
+            border-radius: var(--r);
+            padding: 7px 12px;
+            text-align: center;
+            flex: 1;
+        }
+
+        .dim-badge-label {
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            color: var(--light);
+        }
+
+        .dim-badge-value {
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--navy);
+        }
+
+        /* ── RIGHT PANEL ── */
+        .panel {
+            background: var(--white);
+            border: 1px solid var(--border);
+            border-radius: var(--r-lg);
+            overflow: hidden;
+        }
+
+        .panel-header {
+            background: var(--navy);
+            color: #fff;
+            padding: 13px 18px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .panel-body {
+            padding: 18px;
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+        }
+
+        /* Roof type toggle — pill style matching mockup */
+        .roof-toggle {
+            display: flex;
+            border: 1.5px solid var(--blue);
+            border-radius: var(--r);
+            overflow: hidden;
+            background: var(--white);
+        }
+
+        .roof-btn {
+            flex: 1;
+            padding: 9px 0;
+            text-align: center;
+            font-size: 13px;
+            font-weight: 600;
+            font-family: inherit;
+            cursor: pointer;
+            border: none;
+            background: transparent;
+            color: var(--blue);
+            transition: var(--ease);
+        }
+
+        .roof-btn.active { background: var(--blue); color: #fff; }
+        .roof-btn:not(.active):hover { background: var(--blue-light); }
+
+        /* Section */
+        .section { display: flex; flex-direction: column; gap: 10px; }
+
+        .section-title {
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--text);
+            border-bottom: 1.5px solid var(--text);
+            padding-bottom: 5px;
+        }
+
+        /* Field grid */
+        .field-grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
+        .field-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+        .field-grid-1 { display: grid; grid-template-columns: 1fr; gap: 8px; }
+
+        /* Field */
+        .field { display: flex; flex-direction: column; gap: 3px; }
+
+        .field label {
+            font-size: 10.5px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text);
+        }
+
+        .req { color: var(--red); margin-left: 2px; }
+
+        .field select,
+        .field input[type="text"],
+        .field input[type="email"],
+        .field input[type="tel"],
+        .field textarea {
+            background: var(--input-bg);
+            border: 1px solid var(--border);
+            border-radius: var(--r);
+            padding: 7px 9px;
+            font-size: 13px;
+            font-family: inherit;
+            color: var(--text);
+            outline: none;
+            transition: border-color var(--ease), box-shadow var(--ease);
+            -webkit-appearance: none;
+            appearance: none;
+        }
+
+        .field select {
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%23888' stroke-width='1.4' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 9px center;
+            padding-right: 26px;
+            cursor: pointer;
+        }
+
+        .field select:focus,
+        .field input:focus,
+        .field textarea:focus {
+            border-color: var(--blue);
+            box-shadow: 0 0 0 2px rgba(42,86,164,0.14);
+        }
+
+        .field textarea { resize: vertical; min-height: 72px; }
+
+        /* Read-only / prefilled */
+        .field.prefilled select,
+        .field.prefilled input {
+            background: #f0f4fb;
+            border-color: #b8ccee;
+            color: var(--muted);
+            cursor: default;
+        }
+
+        /* Slope field — animated */
+        .slope-wrap {
+            overflow: hidden;
+            max-height: 0;
+            opacity: 0;
+            transition: max-height 0.3s ease, opacity 0.25s ease;
+        }
+
+        .slope-wrap.open { max-height: 80px; opacity: 1; }
+
+        .range-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .range-row input[type="range"] {
+            flex: 1;
+            accent-color: var(--blue);
+            cursor: pointer;
+        }
+
+        .range-val {
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--navy);
+            min-width: 64px;
+            text-align: right;
+        }
+
+        /* Shed toggle */
+        .toggle-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .sw {
+            position: relative;
+            width: 38px;
+            height: 22px;
+            flex-shrink: 0;
+        }
+
+        .sw input { opacity: 0; width: 0; height: 0; position: absolute; }
+
+        .sw-track {
+            position: absolute;
+            inset: 0;
+            background: var(--toggle-off);
+            border-radius: 22px;
+            cursor: pointer;
+            transition: background var(--ease);
+        }
+
+        .sw-track::before {
+            content: '';
+            position: absolute;
+            width: 16px;
+            height: 16px;
+            background: #fff;
+            border-radius: 50%;
+            left: 3px;
+            top: 3px;
+            transition: transform var(--ease);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+        }
+
+        .sw input:checked + .sw-track { background: var(--blue); }
+        .sw input:checked + .sw-track::before { transform: translateX(16px); }
+
+        .toggle-label { font-size: 13px; font-weight: 600; cursor: pointer; user-select: none; }
+
+        /* Shed fields — animated */
+        .shed-fields {
+            overflow: hidden;
+            max-height: 0;
+            opacity: 0;
+            transition: max-height 0.35s ease, opacity 0.28s ease;
+        }
+
+        .shed-fields.open { max-height: 200px; opacity: 1; }
+
+        .shed-fields-inner {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            padding-top: 10px;
+        }
+
+        .hint {
+            font-size: 11px;
+            color: var(--light);
+            font-style: italic;
+        }
+
+        /* Contact grid */
+        .contact-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+        }
+
+        .contact-grid .span2 { grid-column: 1 / -1; }
+
+        /* Prefilled badge */
+        .prefilled-note {
+            display: none;
+            font-size: 11px;
+            color: var(--blue);
+            font-weight: 600;
+            align-items: center;
+            gap: 4px;
+            margin-left: 8px;
+        }
+
+        .prefilled-note svg { width: 11px; height: 11px; stroke: currentColor; fill: none; stroke-width: 2.5; }
+
+        /* Consent */
+        .consent {
+            display: flex;
+            gap: 9px;
+            align-items: flex-start;
+            padding: 10px;
+            background: #fafaf8;
+            border: 1px solid var(--border);
+            border-radius: var(--r);
+        }
+
+        .consent input[type="checkbox"] {
+            margin-top: 2px;
+            accent-color: var(--blue);
+            width: 14px;
+            height: 14px;
+            flex-shrink: 0;
+            cursor: pointer;
+        }
+
+        .consent label {
+            font-size: 11.5px;
+            color: var(--muted);
+            line-height: 1.6;
+            cursor: pointer;
+        }
+
+        .consent label a { color: var(--blue); }
+
+        .privacy-link {
+            font-size: 12px;
+            color: var(--blue);
+            text-decoration: underline;
+        }
+
+        /* Submit */
+        .submit-btn {
+            background: var(--blue);
+            color: #fff;
+            border: none;
+            border-radius: var(--r);
+            padding: 12px 20px;
+            font-size: 14.5px;
+            font-weight: 700;
+            font-family: inherit;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 9px;
+            width: 100%;
+            transition: background var(--ease);
+            letter-spacing: 0.01em;
+        }
+
+        .submit-btn:hover { background: var(--blue-hover); }
+        .submit-btn svg { width: 16px; height: 16px; stroke: currentColor; fill: none; stroke-width: 2.3; }
+
+        .required-note { font-size: 11.5px; color: var(--light); text-align: center; }
+        .required-note span { color: var(--red); }
+
+        hr.divider { border: none; border-top: 1px solid var(--border); }
+
+        /* Error */
+        .field-error {
+            font-size: 11px;
+            color: var(--red);
+            display: none;
+        }
+
+        .field.invalid input,
+        .field.invalid select {
+            border-color: var(--red);
+            box-shadow: 0 0 0 2px rgba(192,57,43,0.12);
+        }
+
+        .field.invalid .field-error { display: block; }
+
+        /* Success banner */
+        .success-banner {
+            display: none;
+            background: #e8f5e9;
+            border: 1px solid #a5d6a7;
+            border-radius: var(--r);
+            padding: 12px 14px;
+            font-size: 13px;
+            color: #2e7d32;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+
+<!-- ══════════════ NAV ══════════════ -->
+<nav>
+    <a class="nav-logo" href="/">Fog</a>
+    <div class="nav-links">
+        <a href="#">Bolig &amp; design</a>
+        <a href="#">Byggemateriale</a>
+        <a href="#">El &amp; belysning</a>
+        <a href="#">Have &amp; fritid</a>
+        <a href="#">Værktøj</a>
+        <a href="#">Mærker</a>
+        <a href="#" class="active">Tilbud</a>
+        <a href="#">Fog pro</a>
+    </div>
+    <div class="nav-right">
+        <!--
+          Thymeleaf: if user is logged in (session attribute "user" exists),
+          show their name; otherwise show "Konto"
+        -->
+        <a class="nav-icon" href="/login">
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+            <!--/* Thymeleaf: show username if logged in */-->
+            <span th:if="${session.user != null}" th:text="${session.user.email}">bruger@email.dk</span>
+            <span th:unless="${session.user != null}">Konto</span>
+        </a>
+        <a class="nav-icon" href="#">
+            <svg viewBox="0 0 24 24"><path d="M12 2C8.1 2 5 5.1 5 9c0 5.3 7 13 7 13s7-7.7 7-13c0-3.9-3.1-7-7-7z"/><circle cx="12" cy="9" r="2.5"/></svg>
+            <span>Find os</span>
+        </a>
+        <a class="nav-icon" href="#">
+            <svg viewBox="0 0 24 24"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+            <span>Kurv</span>
+        </a>
+    </div>
+</nav>
+
+<!-- ══════════════ BREADCRUMB ══════════════ -->
+<div class="breadcrumb">
+    <a href="/">Byg-selv produkter</a> /
+    <a href="/carporte">Carporte</a> /
+    <a href="/carporte/quick-byg">Quick-Byg carporte</a> /
+    <span id="breadcrumbCurrent">Quick-Byg carport med fladt tag</span>
+</div>
+
+<!-- ══════════════ PAGE ══════════════ -->
+<div class="page">
+
+    <!-- LEFT COLUMN -->
+    <div class="page-left">
+        <h1 id="pageTitle">Bestil Quick-Byg tilbud – carport med fladt tag</h1>
+        <p>Med et specialudviklet computerprogram kan vi lynhurtigt beregne prisen og udskrive en skitsetegning på en carport indenfor vores standardprogram.</p>
+        <p>Tilbud og skitsetegning fremsendes så hurtigt som muligt. Ved bestilling medfølger standardbyggevejledning.</p>
+
+        <!-- DRAWING CARD -->
+        <div class="drawing-card">
+            <div class="drawing-card-header">
+                <span>Live skitsetegning</span>
+                <div class="view-toggle">
+                    <button class="view-btn active" id="btnTop"  onclick="setView('top')">Ovenfra</button>
+                    <button class="view-btn"        id="btnSide" onclick="setView('side')">Fra siden</button>
+                </div>
+            </div>
+            <div class="drawing-area">
+
+                <!-- TOP VIEW SVG -->
+                <div class="canvas-wrap" id="canvasTop">
+                    <svg viewBox="0 0 380 200" xmlns="http://www.w3.org/2000/svg">
+                        <!-- compass -->
+                        <text x="14" y="36" font-size="9" fill="#bbb" text-anchor="middle">N</text>
+                        <text x="14" y="178" font-size="9" fill="#bbb" text-anchor="middle">S</text>
+                        <!-- carport body -->
+                        <rect id="tBody" x="30" y="28" width="220" height="130"
+                              fill="#dde8f5" stroke="#2a56a4" stroke-width="1.8"/>
+                        <!-- ridge line (pitched only) -->
+                        <line id="tRidge" x1="140" y1="28" x2="140" y2="158"
+                              stroke="#2a56a4" stroke-width="1.2" stroke-dasharray="5,3" opacity="0"/>
+                        <!-- posts (corners) -->
+                        <rect id="tP1" x="30"  y="28"  width="7" height="7" fill="#1b3a5c"/>
+                        <rect id="tP2" x="243" y="28"  width="7" height="7" fill="#1b3a5c"/>
+                        <rect id="tP3" x="30"  y="151" width="7" height="7" fill="#1b3a5c"/>
+                        <rect id="tP4" x="243" y="151" width="7" height="7" fill="#1b3a5c"/>
+                        <!-- shed (bottom-right corner, hidden by default) -->
+                        <rect id="tShed" x="250" y="100" width="65" height="58"
+                              fill="#d4e8d4" stroke="#3a7a3a" stroke-width="1.4" opacity="0"/>
+                        <text id="tShedLbl" x="282" y="132" text-anchor="middle"
+                              font-size="9" fill="#3a7a3a" opacity="0">Skur</text>
+                        <!-- dim labels -->
+                        <text id="tLblW" x="140" y="192" text-anchor="middle"
+                              font-size="11" fill="#555">Bredde: 330 cm</text>
+                        <text id="tLblL" x="366" y="93" text-anchor="middle"
+                              font-size="11" fill="#555" transform="rotate(-90 366 93)">Længde: 500 cm</text>
+                    </svg>
+                </div>
+
+                <!-- SIDE VIEW SVG -->
+                <div class="canvas-wrap" id="canvasSide" style="display:none">
+                    <svg viewBox="0 0 380 200" xmlns="http://www.w3.org/2000/svg">
+                        <!-- ground -->
+                        <line x1="18" y1="168" x2="362" y2="168" stroke="#ccc" stroke-width="1.4"/>
+                        <text x="22" y="180" font-size="9" fill="#bbb">Terræn</text>
+                        <!-- left post -->
+                        <rect id="sPostL" x="44" y="88" width="7" height="80" fill="#1b3a5c"/>
+                        <!-- right post -->
+                        <rect id="sPostR" x="257" y="88" width="7" height="80" fill="#1b3a5c"/>
+                        <!-- FLAT: roof beam -->
+                        <rect id="sRoofFlat" x="36" y="80" width="238" height="10"
+                              fill="#c8d8f0" stroke="#2a56a4" stroke-width="1.4" opacity="1"/>
+                        <!-- PITCHED: gable roof (hidden by default) -->
+                        <!--
+                          Gable: ridge in the centre-top, slopes down to both sides.
+                          Left eave: (36, 88), Ridge: (155, 44), Right eave: (274, 88)
+                        -->
+                        <polygon id="sRoofPitch"
+                                 points="36,88 155,44 274,88"
+                                 fill="#c8d8f0" stroke="#2a56a4" stroke-width="1.4" opacity="0"/>
+                        <!-- ridge line marker -->
+                        <line id="sRidgeLine"
+                              x1="155" y1="44" x2="155" y2="88"
+                              stroke="#2a56a4" stroke-width="1" stroke-dasharray="4,3" opacity="0"/>
+                        <!-- slope angle arc -->
+                        <path id="sSlopeArc"
+                              d="M 44,88 A 34,34 0 0,1 78,88"
+                              fill="rgba(42,86,164,0.12)" stroke="#2a56a4" stroke-width="1" opacity="0"/>
+                        <text id="sSlopeText" x="62" y="84" font-size="9" fill="#2a56a4" opacity="0">25°</text>
+                        <!-- shed (side, right of carport) -->
+                        <rect id="sShedBody" x="264" y="118" width="52" height="50"
+                              fill="#d4e8d4" stroke="#3a7a3a" stroke-width="1.3" opacity="0"/>
+                        <rect id="sShedRoof" x="260" y="110" width="60" height="9"
+                              fill="#b8d8b8" stroke="#3a7a3a" stroke-width="1" opacity="0"/>
+                        <text id="sShedLbl2" x="290" y="147" text-anchor="middle"
+                              font-size="9" fill="#3a7a3a" opacity="0">Skur</text>
+                        <!-- height annotation -->
+                        <line x1="26" y1="88" x2="26" y2="168" stroke="#e09020" stroke-width="1" stroke-dasharray="3,3"/>
+                        <line x1="22" y1="88"  x2="30" y2="88"  stroke="#e09020" stroke-width="1.4"/>
+                        <line x1="22" y1="168" x2="30" y2="168" stroke="#e09020" stroke-width="1.4"/>
+                        <text id="sLblH" x="15" y="130" text-anchor="middle" font-size="9"
+                              fill="#e09020" transform="rotate(-90 15 130)">210 cm</text>
+                        <!-- width annotation -->
+                        <line id="sLineW" x1="44" y1="186" x2="264" y2="186"
+                              stroke="#e09020" stroke-width="1" stroke-dasharray="3,3"/>
+                        <line x1="44"  y1="182" x2="44"  y2="190" stroke="#e09020" stroke-width="1.4"/>
+                        <line x1="264" y1="182" x2="264" y2="190" stroke="#e09020" stroke-width="1.4"/>
+                        <text id="sLblW" x="154" y="198" text-anchor="middle"
+                              font-size="10" fill="#e09020">330 cm</text>
+                    </svg>
+                </div>
+
+                <!-- DIM BADGES -->
+                <div class="dim-row">
+                    <div class="dim-badge">
+                        <div class="dim-badge-label">Bredde</div>
+                        <div class="dim-badge-value" id="dimW">330 cm</div>
+                    </div>
+                    <div class="dim-badge">
+                        <div class="dim-badge-label">Længde</div>
+                        <div class="dim-badge-value" id="dimL">500 cm</div>
+                    </div>
+                    <div class="dim-badge" id="dimSlopeBadge" style="display:none">
+                        <div class="dim-badge-label">Hældning</div>
+                        <div class="dim-badge-value" id="dimSlope">25°</div>
+                    </div>
+                    <div class="dim-badge" id="dimShedBadge" style="display:none">
+                        <div class="dim-badge-label">Skur</div>
+                        <div class="dim-badge-value" id="dimShed">270×210</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ══════════════ RIGHT PANEL ══════════════ -->
+    <!--
+      Thymeleaf form:
+      - th:action binds to the POST route /request/submit
+      - th:object binds to the RequestDTO passed by the controller
+      - Each field uses th:field to bind to the DTO
+    -->
+    <div class="panel">
+        <div class="panel-header" id="panelHeader">Carport med fladt tag</div>
+        <div class="panel-body">
+
+            <!-- Roof toggle (JS-only, sets hidden input) -->
+            <div class="roof-toggle" role="tablist">
+                <button class="roof-btn active" id="btnFlat"
+                        onclick="setRoof('flat')" type="button"
+                        role="tab" aria-selected="true">Fladt tag</button>
+                <button class="roof-btn" id="btnPitch"
+                        onclick="setRoof('pitch')" type="button"
+                        role="tab" aria-selected="false">Høj rejsning</button>
+            </div>
+
+            <!-- Success / error banner (Thymeleaf) -->
+            <div th:if="${successMessage}" style="background:#e8f5e9;border:1px solid #a5d6a7;border-radius:3px;padding:11px 13px;font-size:13px;color:#2e7d32;font-weight:600;"
+                 th:text="${successMessage}"></div>
+            <div th:if="${errorMessage}" style="background:#fdecea;border:1px solid #f5c6c2;border-radius:3px;padding:11px 13px;font-size:13px;color:#c0392b;font-weight:600;"
+                 th:text="${errorMessage}"></div>
+
+            <form th:action="@{/request/submit}" th:object="${requestDTO}" method="post" id="orderForm" novalidate>
+
+                <!-- Hidden: roof type (set by JS toggle) -->
+                <input type="hidden" id="roofTypeInput" name="roofType" th:field="*{roofType}" value="flat"/>
+
+                <!-- ── CARPORT SECTION ── -->
+                <div class="section">
+                    <div class="section-title">Carport</div>
+
+                    <div class="field-grid-3">
+                        <!-- Tagtype: populated from roof_type table via Thymeleaf -->
+                        <div class="field">
+                            <label for="rtId">Tagtype <span class="req">*</span></label>
+                            <select id="rtId" name="rtId" th:field="*{rtId}" required>
+                                <option value="">Vælg tagtype</option>
+                                <!--
+                                  roofTypes is a List<RoofType> passed by the controller.
+                                  Each RoofType has rtId and name.
+                                -->
+                                <option th:each="rt : ${roofTypes}"
+                                        th:value="${rt.rtId}"
+                                        th:text="${rt.name}">Plastmo Ecolite – Blå</option>
+                            </select>
+                        </div>
+
+                        <!-- Width: predefined steps in cm -->
+                        <div class="field">
+                            <label for="carpWidth">Bredde <span class="req">*</span></label>
+                            <select id="carpWidth" name="width" th:field="*{width}"
+                                    onchange="updatePreview()" required>
+                                <option value="240">240 cm</option>
+                                <option value="270">270 cm</option>
+                                <option value="300">300 cm</option>
+                                <option value="330" selected>330 cm</option>
+                                <option value="360">360 cm</option>
+                                <option value="390">390 cm</option>
+                                <option value="420">420 cm</option>
+                                <option value="450">450 cm</option>
+                                <option value="480">480 cm</option>
+                                <option value="600">600 cm</option>
+                            </select>
+                        </div>
+
+                        <!-- Length: predefined steps in cm -->
+                        <div class="field">
+                            <label for="carpLength">Længde <span class="req">*</span></label>
+                            <select id="carpLength" name="length" th:field="*{length}"
+                                    onchange="updatePreview()" required>
+                                <option value="360">360 cm</option>
+                                <option value="420">420 cm</option>
+                                <option value="480">480 cm</option>
+                                <option value="500" selected>500 cm</option>
+                                <option value="540">540 cm</option>
+                                <option value="600">600 cm</option>
+                                <option value="720">720 cm</option>
+                                <option value="780">780 cm</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Slope (høj rejsning only) -->
+                    <div class="slope-wrap" id="slopeWrap">
+                        <div class="field">
+                            <label>Taghældning <span class="req">*</span></label>
+                            <div class="range-row">
+                                <input type="range" id="slopeRange" name="slope"
+                                       th:field="*{slope}"
+                                       min="15" max="45" step="5" value="25"
+                                       oninput="updateSlope(this.value)"/>
+                                <div class="range-val" id="slopeVal">25 grader</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ── SHED SECTION ── -->
+                <div class="section">
+                    <div class="section-title">Redskabsrum</div>
+
+                    <div class="toggle-row">
+                        <label class="sw">
+                            <input type="checkbox" id="shedToggle"
+                                   name="includeShed" th:field="*{includeShed}"
+                                   onchange="toggleShed()"/>
+                            <span class="sw-track"></span>
+                        </label>
+                        <span class="toggle-label"
+                              onclick="document.getElementById('shedToggle').click()">
+              Tilføj redskabsrum
+            </span>
+                    </div>
+
+                    <div class="shed-fields" id="shedFields">
+                        <div class="shed-fields-inner">
+                            <div class="field-grid-3">
+                                <div class="field">
+                                    <label for="shedWidth">Bredde <span class="req">*</span></label>
+                                    <select id="shedWidth" name="shedWidth"
+                                            th:field="*{shedWidth}" onchange="updatePreview()">
+                                        <option value="210">210 cm</option>
+                                        <option value="240">240 cm</option>
+                                        <option value="270" selected>270 cm</option>
+                                        <option value="300">300 cm</option>
+                                    </select>
+                                </div>
+                                <div class="field">
+                                    <label for="shedLength">Længde <span class="req">*</span></label>
+                                    <select id="shedLength" name="shedLength"
+                                            th:field="*{shedLength}" onchange="updatePreview()">
+                                        <option value="180">180 cm</option>
+                                        <option value="210" selected>210 cm</option>
+                                        <option value="240">240 cm</option>
+                                        <option value="270">270 cm</option>
+                                    </select>
+                                </div>
+                                <div class="field">
+                                    <label for="shedCladding">Beklædning <span class="req">*</span></label>
+                                    <select id="shedCladding" name="shedCladding"
+                                            th:field="*{shedCladding}">
+                                        <option value="brædt">Bræddebeklædning</option>
+                                        <option value="lodret">Lodret bræt</option>
+                                        <option value="vandret">Vandret bræt</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <p class="hint">NB! Der beregnes 15 cm tagudhæng på hver side af redskabsrummet.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <hr class="divider"/>
+
+                <!-- ── COMMENTS ── -->
+                <div class="section">
+                    <div class="section-title">Evt. bemærkninger</div>
+                    <div class="field">
+            <textarea id="comments" name="comments"
+                      th:field="*{comments}"
+                      placeholder="Skriv eventuelle bemærkninger her..."></textarea>
+                    </div>
+                </div>
+
+                <hr class="divider"/>
+
+                <!-- ── CONTACT INFO ── -->
+                <!--
+                  If user is logged in, contact_info is pre-fetched by the controller
+                  and bound via contactInfo object. Fields are readonly.
+                  If guest, fields are empty and editable.
+                -->
+                <div class="section" id="contactSection">
+                    <div class="section-title">
+                        Kontakt oplysninger <span class="req">*</span>
+                        <span class="prefilled-note" id="prefilledNote">
+              <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+              Auto-udfyldt
+            </span>
+                    </div>
+
+                    <div class="contact-grid">
+                        <div class="field" id="fnField">
+                            <label for="firstName">Fornavn <span class="req">*</span></label>
+                            <input type="text" id="firstName" name="firstName"
+                                   th:field="*{firstName}"
+                                   th:value="${contactInfo != null ? contactInfo.firstName : ''}"
+                                   th:readonly="${contactInfo != null}"
+                                   placeholder="Fornavn" required/>
+                            <span class="field-error">Udfyld venligst dit fornavn</span>
+                        </div>
+                        <div class="field" id="lnField">
+                            <label for="lastName">Efternavn <span class="req">*</span></label>
+                            <input type="text" id="lastName" name="lastName"
+                                   th:field="*{lastName}"
+                                   th:value="${contactInfo != null ? contactInfo.lastName : ''}"
+                                   th:readonly="${contactInfo != null}"
+                                   placeholder="Efternavn" required/>
+                            <span class="field-error">Udfyld venligst dit efternavn</span>
+                        </div>
+                        <div class="field span2" id="addrField">
+                            <label for="address">Adresse <span class="req">*</span></label>
+                            <input type="text" id="address" name="address"
+                                   th:field="*{address}"
+                                   th:value="${contactInfo != null ? contactInfo.address : ''}"
+                                   th:readonly="${contactInfo != null}"
+                                   placeholder="Adresse" required/>
+                            <span class="field-error">Udfyld venligst din adresse</span>
+                        </div>
+                        <div class="field" id="zipField">
+                            <label for="zipcode">Postnummer <span class="req">*</span></label>
+                            <!--
+                              zipcode is a FK in contact_info -> zip table.
+                              We show the zipcode string; on submit, the controller
+                              looks up zip_id by zipcode string.
+                            -->
+                            <input type="text" id="zipcode" name="zipcode"
+                                   th:field="*{zipcode}"
+                                   th:value="${contactInfo != null ? contactInfo.zipcode : ''}"
+                                   th:readonly="${contactInfo != null}"
+                                   placeholder="Postnummer" required/>
+                            <span class="field-error">Udfyld venligst dit postnummer</span>
+                        </div>
+                        <div class="field" id="cityField">
+                            <label for="town">By <span class="req">*</span></label>
+                            <input type="text" id="town" name="town"
+                                   th:field="*{town}"
+                                   th:value="${contactInfo != null ? contactInfo.town : ''}"
+                                   th:readonly="${contactInfo != null}"
+                                   placeholder="By" required/>
+                            <span class="field-error">Udfyld venligst din by</span>
+                        </div>
+                        <div class="field" id="emailField">
+                            <label for="email">Email <span class="req">*</span></label>
+                            <input type="email" id="email" name="email"
+                                   th:field="*{email}"
+                                   th:value="${contactInfo != null ? contactInfo.email : ''}"
+                                   th:readonly="${contactInfo != null}"
+                                   placeholder="Email" required/>
+                            <span class="field-error">Udfyld venligst din email</span>
+                        </div>
+                        <div class="field" id="phoneField">
+                            <label for="phone">Telefon <span class="req">*</span></label>
+                            <input type="tel" id="phone" name="phone"
+                                   th:field="*{phone}"
+                                   th:value="${contactInfo != null ? contactInfo.phone : ''}"
+                                   th:readonly="${contactInfo != null}"
+                                   placeholder="Telefon" required/>
+                            <span class="field-error">Udfyld venligst dit telefonnummer</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- CONSENT -->
+                <div class="consent">
+                    <input type="checkbox" id="consent" name="consent" required/>
+                    <label for="consent">
+                        Jeg giver samtykke til, at Johannes Fog A/S må kontakte mig via telefon og/eller
+                        e-mail i forbindelse med tilbud på Quick-Byg carport og at de afgivne oplysninger
+                        opbevares og behandles jf. <a href="/persondatapolitik">Fogs persondatapolitik</a>.
+                    </label>
+                </div>
+                <a class="privacy-link" href="/persondatapolitik">Læs mere om persondatapolitik her</a>
+
+                <!-- SUBMIT -->
+                <button class="submit-btn" type="submit" onclick="return validateForm()">
+                    Send forespørgsel
+                    <svg viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+                </button>
+
+                <p class="required-note">Felter markeret med <span>*</span> er obligatoriske</p>
+
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- ══════════════ JS ══════════════ -->
+<script>
+    /* ─── State ─── */
+    let roofType  = 'flat';
+    let hasShed   = false;
+    let curView   = 'top';
+
+    /* ─── Thymeleaf pre-fill detection ───
+       If contactInfo was injected server-side (user is logged in),
+       the inputs will be readonly — mark them as prefilled visually.
+    */
+    document.addEventListener('DOMContentLoaded', () => {
+        const fn = document.getElementById('firstName');
+        if (fn && fn.readOnly && fn.value.trim() !== '') {
+            applyPrefilledStyle();
+        }
+        updatePreview();
+    });
+
+    function applyPrefilledStyle() {
+        const ids = ['fnField','lnField','addrField','zipField','cityField','emailField','phoneField'];
+        ids.forEach(id => {
+            const el = document.getElementById(id);
+            if (el) el.classList.add('prefilled');
+        });
+        const note = document.getElementById('prefilledNote');
+        if (note) note.style.display = 'inline-flex';
+    }
+
+    /* ─── VIEW TOGGLE ─── */
+    function setView(v) {
+        curView = v;
+        document.getElementById('canvasTop').style.display  = v === 'top'  ? 'block' : 'none';
+        document.getElementById('canvasSide').style.display = v === 'side' ? 'block' : 'none';
+        document.getElementById('btnTop').classList.toggle('active',  v === 'top');
+        document.getElementById('btnSide').classList.toggle('active', v === 'side');
+        updatePreview();
+    }
+
+    /* ─── ROOF TYPE TOGGLE ─── */
+    function setRoof(type) {
+        roofType = type;
+        const isFlat = type === 'flat';
+
+        document.getElementById('btnFlat').classList.toggle('active', isFlat);
+        document.getElementById('btnPitch').classList.toggle('active', !isFlat);
+        document.getElementById('slopeWrap').classList.toggle('open', !isFlat);
+        document.getElementById('dimSlopeBadge').style.display = isFlat ? 'none' : 'block';
+        document.getElementById('roofTypeInput').value = type;
+
+        const title = isFlat
+            ? 'Bestil Quick-Byg tilbud – carport med fladt tag'
+            : 'Bestil Quick-Byg tilbud – carport med høj rejsning';
+        document.getElementById('pageTitle').textContent    = title;
+        document.getElementById('panelHeader').textContent  = isFlat ? 'Carport med fladt tag' : 'Carport med høj rejsning';
+        document.getElementById('breadcrumbCurrent').textContent = isFlat
+            ? 'Quick-Byg carport med fladt tag'
+            : 'Quick-Byg carport med høj rejsning';
+
+        updatePreview();
+    }
+
+    /* ─── SHED TOGGLE ─── */
+    function toggleShed() {
+        hasShed = document.getElementById('shedToggle').checked;
+        document.getElementById('shedFields').classList.toggle('open', hasShed);
+        document.getElementById('dimShedBadge').style.display = hasShed ? 'block' : 'none';
+        updatePreview();
+    }
+
+    /* ─── SLOPE SLIDER ─── */
+    function updateSlope(val) {
+        document.getElementById('slopeVal').textContent  = val + ' grader';
+        document.getElementById('dimSlope').textContent  = val + '°';
+        updatePreview();
+    }
+
+    /* ─── PREVIEW ─── */
+    function updatePreview() {
+        const w     = parseInt(document.getElementById('carpWidth').value)  || 330;
+        const l     = parseInt(document.getElementById('carpLength').value) || 500;
+        const sw    = parseInt(document.getElementById('shedWidth').value)  || 270;
+        const sl    = parseInt(document.getElementById('shedLength').value) || 210;
+        const slope = parseInt(document.getElementById('slopeRange') ? document.getElementById('slopeRange').value : 25) || 25;
+
+        document.getElementById('dimW').textContent = w + ' cm';
+        document.getElementById('dimL').textContent = l + ' cm';
+        if (hasShed) document.getElementById('dimShed').textContent = sw + '×' + sl;
+
+        if (curView === 'top') drawTop(w, l, sw, sl, slope);
+        else                   drawSide(w, l, sw, sl, slope);
+    }
+
+    /* ─── TOP VIEW ─── */
+    function drawTop(w, l, sw, sl, slope) {
+        /* scale to SVG viewBox 380×200, carport starts at x=30, y=28 */
+        const maxW = 200, maxH = 120;
+        const cW   = Math.max(80,  Math.min(maxW, w * 0.44));
+        const cH   = Math.max(60,  Math.min(maxH, l * 0.20));
+        const rx = 30, ry = 28;
+
+        set('tBody',  'width',  cW);
+        set('tBody',  'height', cH);
+
+        /* posts */
+        set('tP2', 'x', rx + cW - 7);
+        set('tP3', 'y', ry + cH - 7);
+        set('tP4', 'x', rx + cW - 7);
+        set('tP4', 'y', ry + cH - 7);
+
+        /* ridge line for pitched (runs along the length, centre of width) */
+        const ridgeX = rx + cW / 2;
+        attr('tRidge', 'x1', ridgeX); attr('tRidge', 'x2', ridgeX);
+        attr('tRidge', 'y1', ry);     attr('tRidge', 'y2', ry + cH);
+        attr('tRidge', 'opacity', roofType === 'pitch' ? '1' : '0');
+
+        /* dim labels */
+        attr('tLblW', 'x', rx + cW / 2);
+        document.getElementById('tLblW').textContent = 'Bredde: ' + w + ' cm';
+        const lx = rx + cW + 22;
+        attr('tLblL', 'x', lx);
+        attr('tLblL', 'y', ry + cH / 2);
+        attr('tLblL', 'transform', `rotate(-90 ${lx} ${ry + cH / 2})`);
+        document.getElementById('tLblL').textContent = 'Længde: ' + l + ' cm';
+
+        /* shed (bottom-right corner) */
+        const sOp = hasShed ? '1' : '0';
+        const shedW = Math.min(60, sw * 0.19);
+        const shedH = Math.min(55, sl * 0.22);
+        attr('tShed', 'x',       rx + cW);
+        attr('tShed', 'y',       ry + cH - shedH);
+        attr('tShed', 'width',   shedW);
+        attr('tShed', 'height',  shedH);
+        attr('tShed', 'opacity', sOp);
+        attr('tShedLbl', 'x',       rx + cW + shedW / 2);
+        attr('tShedLbl', 'y',       ry + cH - shedH / 2 + 3);
+        attr('tShedLbl', 'opacity', sOp);
+    }
+
+    /* ─── SIDE VIEW ─── */
+    function drawSide(w, l, sw, sl, slope) {
+        /*
+          Ground at y=168.
+          Post height ~80px (represents ~210 cm).
+          Width scaled: maxW=220px.
+        */
+        const groundY = 168;
+        const postH   = 80;
+        const roofY   = groundY - postH;          /* = 88 */
+        const cW      = Math.max(80, Math.min(220, w * 0.40));
+        const leftX   = 44;
+        const rightX  = leftX + cW;
+        const isFlat  = roofType === 'flat';
+
+        /* posts */
+        set('sPostL', 'x', leftX);
+        set('sPostL', 'y', roofY);
+        set('sPostR', 'x', rightX);
+        set('sPostR', 'y', roofY);
+
+        /* flat roof */
+        attr('sRoofFlat', 'x',       leftX  - 8);
+        attr('sRoofFlat', 'width',   cW + 16);
+        attr('sRoofFlat', 'y',       roofY  - 10);
+        attr('sRoofFlat', 'opacity', isFlat ? '1' : '0');
+
+        /* pitched (gable) roof:
+           Ridge is in the CENTRE of the width, at the top.
+           The steeper the slope, the higher the ridge.
+        */
+        const pct     = (slope - 15) / 30;          /* 0 (15°) → 1 (45°) */
+        const ridgeH  = 20 + pct * 44;              /* 20–64 px above roofY */
+        const ridgeX  = leftX + cW / 2;
+        const ridgeY  = roofY - ridgeH;
+
+        attr('sRoofPitch', 'points',
+            `${leftX - 8},${roofY} ${ridgeX},${ridgeY} ${rightX + 8},${roofY}`);
+        attr('sRoofPitch',  'opacity', isFlat ? '0' : '1');
+        attr('sRidgeLine',  'x1', ridgeX); attr('sRidgeLine', 'x2', ridgeX);
+        attr('sRidgeLine',  'y1', ridgeY); attr('sRidgeLine', 'y2', roofY);
+        attr('sRidgeLine',  'opacity', isFlat ? '0' : '1');
+
+        /* slope angle arc (left side) */
+        const arcR = 30;
+        attr('sSlopeArc', 'd',
+            `M ${leftX},${roofY} A ${arcR},${arcR} 0 0,1 ${leftX + arcR * 0.85},${roofY - arcR * 0.53}`);
+        attr('sSlopeArc',  'opacity', isFlat ? '0' : '1');
+        attr('sSlopeText', 'x',       leftX + 18);
+        attr('sSlopeText', 'y',       roofY - 10);
+        document.getElementById('sSlopeText').textContent = slope + '°';
+        attr('sSlopeText', 'opacity', isFlat ? '0' : '1');
+
+        /* width annotation */
+        attr('sLineW', 'x1', leftX);
+        attr('sLineW', 'x2', rightX);
+        attr('sLblW',  'x',  leftX + cW / 2);
+        document.getElementById('sLblW').textContent = w + ' cm';
+
+        /* shed (right of carport) */
+        const sOp     = hasShed ? '1' : '0';
+        const shedWpx = Math.min(50, sw * 0.16);
+        const shedHpx = 50;
+        const shedX   = rightX + 8;
+        const shedY   = groundY - shedHpx;
+        attr('sShedBody',  'x',       shedX);
+        attr('sShedBody',  'y',       shedY);
+        attr('sShedBody',  'width',   shedWpx);
+        attr('sShedBody',  'height',  shedHpx);
+        attr('sShedBody',  'opacity', sOp);
+        attr('sShedRoof',  'x',       shedX - 4);
+        attr('sShedRoof',  'y',       shedY - 9);
+        attr('sShedRoof',  'width',   shedWpx + 8);
+        attr('sShedRoof',  'opacity', sOp);
+        attr('sShedLbl2',  'x',       shedX + shedWpx / 2);
+        attr('sShedLbl2',  'y',       shedY + shedHpx / 2 + 3);
+        attr('sShedLbl2',  'opacity', sOp);
+    }
+
+    /* ─── Helpers ─── */
+    function attr(id, name, val) {
+        const el = document.getElementById(id);
+        if (el) el.setAttribute(name, val);
+    }
+    function set(id, name, val) { attr(id, name, val); }
+
+    /* ─── FORM VALIDATION ─── */
+    function validateForm() {
+        let valid = true;
+        const required = ['firstName','lastName','address','zipcode','town','email','phone'];
+        required.forEach(id => {
+            const input = document.getElementById(id);
+            if (!input || input.readOnly) return;   /* skip prefilled */
+            const field = input.closest('.field');
+            if (!input.value.trim()) {
+                field.classList.add('invalid');
+                valid = false;
+            } else {
+                field.classList.remove('invalid');
+            }
+        });
+        if (!document.getElementById('consent').checked) {
+            alert('Du skal give samtykke for at sende forespørgslen.');
+            valid = false;
+        }
+        return valid;
+    }
+</script>
+
+</body>
+</html>
