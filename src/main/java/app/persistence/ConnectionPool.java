@@ -17,6 +17,14 @@ public class ConnectionPool
     {
     }
 
+    private static String requiredEnv(String key) {
+        String val = System.getenv(key);
+        if (val == null || val.isBlank()) {
+            throw new IllegalStateException("Missing required env var: " + key);
+        }
+        return val;
+    }
+
     public static ConnectionPool getInstance()
     {
         if (instance == null)
@@ -39,13 +47,12 @@ public class ConnectionPool
         ds.close();
     }
 
-    private static HikariDataSource createHikariConnectionPool()
-    {
+    private static HikariDataSource createHikariConnectionPool() {
         HikariConfig config = new HikariConfig();
 
-        config.setJdbcUrl(System.getenv("JDBC_URL"));
-        config.setUsername(System.getenv("JDBC_USER"));
-        config.setPassword(System.getenv("JDBC_PASSWORD"));
+        config.setJdbcUrl(requiredEnv("JDBC_URL"));
+        config.setUsername(requiredEnv("JDBC_USER"));
+        config.setPassword(requiredEnv("JDBC_PASSWORD"));
 
         config.setMaximumPoolSize(10);
 
