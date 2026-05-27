@@ -13,15 +13,22 @@ public class ConnectionPool
     public static ConnectionPool instance = null;
     public static HikariDataSource ds = null;
 
-    private ConnectionPool()
-    {
-    }
+    private ConnectionPool() {}
 
-    private static String requiredEnv(String key) {
+    private static String config(String key) {
+        // 1. env vars (Docker / Linux / CI)
         String val = System.getenv(key);
+
+        // 2. JVM system properties (IntelliJ / Maven -D)
         if (val == null || val.isBlank()) {
-            throw new IllegalStateException("Missing required env var: " + key);
+            val = System.getProperty(key);
         }
+
+        // 3. final validation
+        if (val == null || val.isBlank()) {
+            throw new IllegalStateException("Missing config: " + key);
+        }
+
         return val;
     }
 
@@ -32,7 +39,6 @@ public class ConnectionPool
             ds = createHikariConnectionPool();
             instance = new ConnectionPool();
         }
-
         return instance;
     }
 
@@ -44,15 +50,16 @@ public class ConnectionPool
     public synchronized void close()
     {
         Logger.getLogger("web").log(Level.INFO, "Shutting down connection pool");
-        ds.close();
+        if (ds != null) ds.close();
     }
 
-    private static HikariDataSource createHikariConnectionPool() {
+    private static HikariDataSource createHikariConnectionPool()
+    {
         HikariConfig config = new HikariConfig();
 
-        config.setJdbcUrl(requiredEnv("JDBC_URL"));
-        config.setUsername(requiredEnv("JDBC_USER"));
-        config.setPassword(requiredEnv("JDBC_PASSWORD"));
+        config.setJdbcUrl(config("JDBC_URL"));
+        config.setUsername(config("JDBC_USER"));
+        config.setPassword(config("JDBC_PASSWORD"));
 
         config.setMaximumPoolSize(10);
 
