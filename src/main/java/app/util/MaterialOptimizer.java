@@ -16,8 +16,7 @@ public class MaterialOptimizer {
 
         for (Component first : stock) {
 
-            double firstLength =
-                    first.getLength();
+            double firstLength = first.getLength();
 
             if (firstLength >= requiredLength) {
 
