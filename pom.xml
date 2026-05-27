@@ -117,7 +117,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-shade-plugin</artifactId>
-                <version>3.5.0</version>
+                <version>3.6.2</version>
 
                 <executions>
                     <execution>
@@ -127,13 +127,19 @@
                         </goals>
 
                         <configuration>
-                            <finalName>carport-fat</finalName>
+
+                            <!-- THIS is the important fix -->
+                            <shadedArtifactAttached>true</shadedArtifactAttached>
+                            <shadedClassifierName>fat</shadedClassifierName>
+
+                            <createDependencyReducedPom>false</createDependencyReducedPom>
 
                             <transformers>
                                 <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
                                     <mainClass>app.Main</mainClass>
                                 </transformer>
                             </transformers>
+
                         </configuration>
                     </execution>
                 </executions>
