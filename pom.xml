@@ -127,11 +127,7 @@
                         </goals>
 
                         <configuration>
-
-                            <!-- THIS is the important fix -->
-                            <shadedArtifactAttached>true</shadedArtifactAttached>
-                            <shadedClassifierName>fat</shadedClassifierName>
-
+                            <finalName>carport</finalName>
                             <createDependencyReducedPom>false</createDependencyReducedPom>
 
                             <transformers>
@@ -139,7 +135,6 @@
                                     <mainClass>app.Main</mainClass>
                                 </transformer>
                             </transformers>
-
                         </configuration>
                     </execution>
                 </executions>
