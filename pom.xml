@@ -135,7 +135,7 @@
                                 </transformer>
                             </transformers>
 
-                            <!-- THIS is the key fix -->
+
                             <shadedArtifactAttached>false</shadedArtifactAttached>
                         </configuration>
                     </execution>
