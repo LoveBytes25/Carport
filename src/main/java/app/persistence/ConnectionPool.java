@@ -41,7 +41,12 @@ public class ConnectionPool
     {
         HikariConfig config = new HikariConfig();
 
+        System.out.println("DEBUG BEFORE JDBC URL");
+
         config.setJdbcUrl("jdbc:postgresql://164.92.243.232:5432/carport");
+
+        System.out.println("DEBUG AFTER JDBC URL: " + config.getJdbcUrl());
+
         config.setUsername("postgres");
         config.setPassword("Kingfisher17");
 
