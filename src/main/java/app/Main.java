@@ -12,6 +12,7 @@ public class Main
 {
     public static void main(String[] args)
     {
+        System.out.println("App Started");
         // Initialize connection pool
         ConnectionPool connectionPool = ConnectionPool.getInstance();
 
