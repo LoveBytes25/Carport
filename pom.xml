@@ -127,7 +127,6 @@
                         </goals>
 
                         <configuration>
-                            <finalName>carport</finalName>
                             <createDependencyReducedPom>false</createDependencyReducedPom>
 
                             <transformers>
@@ -135,6 +134,9 @@
                                     <mainClass>app.Main</mainClass>
                                 </transformer>
                             </transformers>
+
+                            <!-- THIS is the key fix -->
+                            <shadedArtifactAttached>false</shadedArtifactAttached>
                         </configuration>
                     </execution>
                 </executions>
