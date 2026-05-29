@@ -3,10 +3,10 @@ package app.entities;
 import java.time.LocalDate;
 
 public class PriceCatalog {
-    int id;
-    Double unitPrice;
-    LocalDate validFrom;
-    LocalDate validTo;
+    private int id;
+    private Double unitPrice;
+    private LocalDate validFrom;
+    private LocalDate validTo;
 
     public PriceCatalog(int id, Double unitPrice, LocalDate validFrom, LocalDate validTo) {
         this.id = id;

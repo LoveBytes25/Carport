@@ -1,9 +1,9 @@
 package app.entities;
 
 public class RequestLine {
-    int id;
-    int quantity;
-    Double unitPrice;
+    private int id;
+    private int quantity;
+    private Double unitPrice;
 
     public RequestLine(int id, int quantity, Double unitPrice) {
         this.id = id;

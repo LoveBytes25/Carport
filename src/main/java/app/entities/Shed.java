@@ -1,9 +1,9 @@
 package app.entities;
 
 public class Shed {
-    int id;
-    Double length;
-    Double width;
+    private int id;
+    private Double length;
+    private Double width;
 
     public Shed(int id, Double length, Double width) {
         this.id = id;

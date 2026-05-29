@@ -3,9 +3,9 @@ package app.entities;
 import java.time.LocalDateTime;
 
 public class Request {
-    int id;
-    LocalDateTime timestamp;
-    RequestStatus status;
+    private int id;
+    private LocalDateTime timestamp;
+    private RequestStatus status;
 
     public Request(int id, LocalDateTime timestamp, RequestStatus status) {
         this.id = id;

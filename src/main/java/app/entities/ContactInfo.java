@@ -1,13 +1,13 @@
 package app.entities;
 
 public class ContactInfo {
-    int id;
-    String firstName;
-    String lastName;
-    String address;
-    String phone;
-    String email;
-    Zip zip;
+    private int id;
+    private String firstName;
+    private String lastName;
+    private String address;
+    private String phone;
+    private String email;
+    private Zip zip;
 
     public ContactInfo(int id, String firstName, String lastName, String address, String phone, String email, Zip zip) {
         this.id = id;

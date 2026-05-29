@@ -1,8 +1,8 @@
 package app.entities;
 
 public class RoofType {
-    int id;
-    String name;
+    private int id;
+    private String name;
 
     public RoofType(int id, String name) {
         this.id = id;

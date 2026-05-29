@@ -1,9 +1,9 @@
 package app.entities;
 
 public class Zip {
-    int id;
-    String zipcode;
-    String town;
+    private int id;
+    private String zipcode;
+    private String town;
 
     public Zip(int id, String zipcode, String town) {
         this.id = id;

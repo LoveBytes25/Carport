@@ -1,10 +1,10 @@
 package app.entities;
 
 public class User {
-    int id;
-    String email;
-    String password;
-    Role role;
+    private int id;
+    private String email;
+    private String password;
+    private Role role;
 
     public User(int id, String email, String password, Role role) {
         this.id = id;

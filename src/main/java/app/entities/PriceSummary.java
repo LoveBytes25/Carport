@@ -3,11 +3,8 @@ package app.entities;
 public class PriceSummary {
 
     private double materialPrice;
-
     private double salesPriceExclVat;
-
     private double vatAmount;
-
     private double totalPriceInclVat;
 
     public double getMaterialPrice() {
