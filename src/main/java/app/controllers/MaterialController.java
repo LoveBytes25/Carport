@@ -29,8 +29,7 @@ public class MaterialController {
         app.post("/calculate-materials", this::calculateMaterials);
     }
 
-    private void calculateMaterials(Context ctx)
-            throws DatabaseException {
+    private void calculateMaterials(Context ctx) throws DatabaseException {
 
         double length = Double.parseDouble(ctx.formParam("length"));
 
