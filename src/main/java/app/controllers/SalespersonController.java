@@ -35,24 +35,28 @@ public class SalespersonController {
             return;
         }
 
+try {
+    List<RequestSummaryDTO> requests = requestMapper.getAllSummaries();
 
-        List<RequestSummaryDTO> requests = requestMapper.getAllSummaries();
+    long total = requests.size();
+    long pending = requests.stream().filter(r -> "PENDING".equals(r.getStatus())).count();
+    long sent = requests.stream().filter(r -> "SENT".equals(r.getStatus())).count();
+    long accepted = requests.stream().filter(r -> "ACCEPTED".equals(r.getStatus())).count();
 
-        long total    = requests.size();
-        long pending  = requests.stream().filter(r -> "PENDING".equals(r.getStatus())).count();
-        long sent     = requests.stream().filter(r -> "SENT".equals(r.getStatus())).count();
-        long accepted = requests.stream().filter(r -> "ACCEPTED".equals(r.getStatus())).count();
+    org.thymeleaf.context.Context thymeleafCtx = new org.thymeleaf.context.Context();
+    thymeleafCtx.setVariable("requests", requests);
+    thymeleafCtx.setVariable("totalCount", total);
+    thymeleafCtx.setVariable("pendingCount", pending);
+    thymeleafCtx.setVariable("sentCount", sent);
+    thymeleafCtx.setVariable("acceptedCount", accepted);
+    thymeleafCtx.setVariable("user", user);
 
-        org.thymeleaf.context.Context thymeleafCtx = new org.thymeleaf.context.Context();
-        thymeleafCtx.setVariable("requests",      requests);
-        thymeleafCtx.setVariable("totalCount",    total);
-        thymeleafCtx.setVariable("pendingCount",  pending);
-        thymeleafCtx.setVariable("sentCount",     sent);
-        thymeleafCtx.setVariable("acceptedCount", accepted);
-        thymeleafCtx.setVariable("user",          user);
+    String html = templateEngine.process("requests", thymeleafCtx);
+    ctx.html(html);
 
-        String html = templateEngine.process("requests", thymeleafCtx);
-        ctx.html(html);
+} catch (Exception e){
+    ctx.result("Database error: " + e.getMessage());
+        }
     }
 
     private void showRequestDetail(Context ctx) {
@@ -64,7 +68,6 @@ public class SalespersonController {
 
         int rqId = Integer.parseInt(ctx.pathParam("id"));
 
-        // Skal tilføje
         ctx.result("Detail view for request #" + rqId + " — coming soon");
     }
 
