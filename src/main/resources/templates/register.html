@@ -20,7 +20,7 @@
 
     <form method="post" action="/register">
 
-        <!-- Login credentials -->
+        <!-- Login s-->
         <div class="section-label">Login</div>
         <div class="field">
             <label for="email">Email <span style="color:#c0392b">*</span></label>
@@ -55,20 +55,20 @@
         <div class="field">
             <label for="address">Adresse <span style="color:#c0392b">*</span></label>
             <input type="text" id="address" name="address"
-                   th:value="${prevAddress ?: ''}"
+                   th:value="${prevAddress != null ? prevAddress : ''}"
                    placeholder="Adresse" required/>
         </div>
         <div class="field-row">
             <div class="field">
                 <label for="zipcode">Postnummer <span style="color:#c0392b">*</span></label>
                 <input type="text" id="zipcode" name="zipcode"
-                       th:value="${prevZipcode ?: ''}"
+                       th:value="${prevZipcode != null ? prevZipcode : ''}"
                        placeholder="2600" required/>
             </div>
             <div class="field">
                 <label for="town">By <span style="color:#c0392b">*</span></label>
                 <input type="text" id="town" name="town"
-                       th:value="${prevTown ?: ''}"
+                       th:value="${prevTown != null ? prevTown : ''}"
                        placeholder="By" required/>
             </div>
         </div>
@@ -76,7 +76,7 @@
             <div class="field">
                 <label for="phone">Telefon <span style="color:#c0392b">*</span></label>
                 <input type="tel" id="phone" name="phone"
-                       th:value="${prevPhone ?: ''}"
+                       th:value="${prevPhone != null ? prevPhone : ''}"
                        placeholder="22 33 44 55" required/>
             </div>
         </div>
