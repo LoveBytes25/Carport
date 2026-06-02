@@ -30,8 +30,8 @@
         <a class="nav-icon" href="/login">
             <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
             <!--/* Thymeleaf: show username if logged in */-->
-            <span th:if="${session.user != null}" th:text="${session.user.email}">bruger@email.dk</span>
-            <span th:unless="${session.user != null}">Konto</span>
+            <span th:if="${user != null}" th:text="${user.email}">bruger@email.dk</span>
+            <span th:unless="${user != null}">Konto</span>
         </a>
         <a class="nav-icon" href="#">
             <svg viewBox="0 0 24 24"><path d="M12 2C8.1 2 5 5.1 5 9c0 5.3 7 13 7 13s7-7.7 7-13c0-3.9-3.1-7-7-7z"/><circle cx="12" cy="9" r="2.5"/></svg>
@@ -178,13 +178,6 @@
         </div>
     </div>
 
-    <!-- ══════════════ RIGHT PANEL ══════════════ -->
-    <!--
-      Thymeleaf form:
-      - th:action binds to the POST route /request/submit
-      - th:object binds to the RequestDTO passed by the controller
-      - Each field uses th:field to bind to the DTO
-    -->
     <div class="panel">
         <div class="panel-header" id="panelHeader">Carport med fladt tag</div>
         <div class="panel-body">
@@ -205,27 +198,23 @@
             <div th:if="${errorMessage}" style="background:#fdecea;border:1px solid #f5c6c2;border-radius:3px;padding:11px 13px;font-size:13px;color:#c0392b;font-weight:600;"
                  th:text="${errorMessage}"></div>
 
-            <form th:action="@{/request/submit}" th:object="${requestDTO}" method="post" id="orderForm" novalidate>
+            <form th:action="@{/request/submit}" method="post" id="orderForm" novalidate>
 
                 <!-- Hidden: roof type (set by JS toggle) -->
-                <input type="hidden" id="roofTypeInput" name="roofType" th:field="*{roofType}" value="flat"/>
+                <input type="hidden" id="roofTypeInput" name="roofType" value="flat"/>
 
                 <!-- ── CARPORT SECTION ── -->
                 <div class="section">
                     <div class="section-title">Carport</div>
 
                     <div class="field-grid-3">
-                        <!-- Tagtype: populated from roof_type table via Thymeleaf -->
                         <div class="field">
                             <label for="rtId">Tagtype <span class="req">*</span></label>
-                            <select id="rtId" name="rtId" th:field="*{rtId}" required>
+                            <select id="rtId" name="rtId" required>
                                 <option value="">Vælg tagtype</option>
-                                <!--
-                                  roofTypes is a List<RoofType> passed by the controller.
-                                  Each RoofType has rtId and name.
-                                -->
+
                                 <option th:each="rt : ${roofTypes}"
-                                        th:value="${rt.rtId}"
+                                        th:value="${rt.Id}"
                                         th:text="${rt.name}">Plastmo Ecolite – Blå</option>
                             </select>
                         </div>
@@ -233,7 +222,7 @@
                         <!-- Width: predefined steps in cm -->
                         <div class="field">
                             <label for="carpWidth">Bredde <span class="req">*</span></label>
-                            <select id="carpWidth" name="width" th:field="*{width}"
+                            <select id="carpWidth" name="width"
                                     onchange="updatePreview()" required>
                                 <option value="240">240 cm</option>
                                 <option value="270">270 cm</option>
@@ -251,7 +240,7 @@
                         <!-- Length: predefined steps in cm -->
                         <div class="field">
                             <label for="carpLength">Længde <span class="req">*</span></label>
-                            <select id="carpLength" name="length" th:field="*{length}"
+                            <select id="carpLength" name="length"
                                     onchange="updatePreview()" required>
                                 <option value="360">360 cm</option>
                                 <option value="420">420 cm</option>
@@ -271,7 +260,6 @@
                             <label>Taghældning <span class="req">*</span></label>
                             <div class="range-row">
                                 <input type="range" id="slopeRange" name="slope"
-                                       th:field="*{slope}"
                                        min="15" max="45" step="5" value="25"
                                        oninput="updateSlope(this.value)"/>
                                 <div class="range-val" id="slopeVal">25 grader</div>
@@ -287,7 +275,7 @@
                     <div class="toggle-row">
                         <label class="sw">
                             <input type="checkbox" id="shedToggle"
-                                   name="includeShed" th:field="*{includeShed}"
+                                   name="includeShed"
                                    onchange="toggleShed()"/>
                             <span class="sw-track"></span>
                         </label>
@@ -303,7 +291,7 @@
                                 <div class="field">
                                     <label for="shedWidth">Bredde <span class="req">*</span></label>
                                     <select id="shedWidth" name="shedWidth"
-                                            th:field="*{shedWidth}" onchange="updatePreview()">
+                                            onchange="updatePreview()">
                                         <option value="210">210 cm</option>
                                         <option value="240">240 cm</option>
                                         <option value="270" selected>270 cm</option>
@@ -313,7 +301,7 @@
                                 <div class="field">
                                     <label for="shedLength">Længde <span class="req">*</span></label>
                                     <select id="shedLength" name="shedLength"
-                                            th:field="*{shedLength}" onchange="updatePreview()">
+                                            onchange="updatePreview()">
                                         <option value="180">180 cm</option>
                                         <option value="210" selected>210 cm</option>
                                         <option value="240">240 cm</option>
@@ -322,8 +310,7 @@
                                 </div>
                                 <div class="field">
                                     <label for="shedCladding">Beklædning <span class="req">*</span></label>
-                                    <select id="shedCladding" name="shedCladding"
-                                            th:field="*{shedCladding}">
+                                    <select id="shedCladding" name="shedCladding">
                                         <option value="brædt">Bræddebeklædning</option>
                                         <option value="lodret">Lodret bræt</option>
                                         <option value="vandret">Vandret bræt</option>
@@ -342,7 +329,7 @@
                     <div class="section-title">Evt. bemærkninger</div>
                     <div class="field">
             <textarea id="comments" name="comments"
-                      th:field="*{comments}"
+                      th:value="${contactInfo != null ? contactInfo.comments : (prevComments != null ? prevComments : '')}"
                       placeholder="Skriv eventuelle bemærkninger her..."></textarea>
                     </div>
                 </div>
@@ -350,11 +337,6 @@
                 <hr class="divider"/>
 
                 <!-- ── CONTACT INFO ── -->
-                <!--
-                  If user is logged in, contact_info is pre-fetched by the controller
-                  and bound via contactInfo object. Fields are readonly.
-                  If guest, fields are empty and editable.
-                -->
                 <div class="section" id="contactSection">
                     <div class="section-title">
                         Kontakt oplysninger <span class="req">*</span>
@@ -368,8 +350,7 @@
                         <div class="field" id="fnField">
                             <label for="firstName">Fornavn <span class="req">*</span></label>
                             <input type="text" id="firstName" name="firstName"
-                                   th:field="*{firstName}"
-                                   th:value="${contactInfo != null ? contactInfo.firstName : ''}"
+                                   th:value="${contactInfo != null ? contactInfo.firstName : (prevFirstName != null ? prevFirstName : '')}"
                                    th:readonly="${contactInfo != null}"
                                    placeholder="Fornavn" required/>
                             <span class="field-error">Udfyld venligst dit fornavn</span>
@@ -377,8 +358,7 @@
                         <div class="field" id="lnField">
                             <label for="lastName">Efternavn <span class="req">*</span></label>
                             <input type="text" id="lastName" name="lastName"
-                                   th:field="*{lastName}"
-                                   th:value="${contactInfo != null ? contactInfo.lastName : ''}"
+                                   th:value="${contactInfo != null ? contactInfo.lastName : (prevLastName != null ? prevLastName : '')}"
                                    th:readonly="${contactInfo != null}"
                                    placeholder="Efternavn" required/>
                             <span class="field-error">Udfyld venligst dit efternavn</span>
@@ -386,22 +366,16 @@
                         <div class="field span2" id="addrField">
                             <label for="address">Adresse <span class="req">*</span></label>
                             <input type="text" id="address" name="address"
-                                   th:field="*{address}"
-                                   th:value="${contactInfo != null ? contactInfo.address : ''}"
+                                   th:value="${contactInfo != null ? contactInfo.address : (prevAddress != null ? prevAddress : '')}"
                                    th:readonly="${contactInfo != null}"
                                    placeholder="Adresse" required/>
                             <span class="field-error">Udfyld venligst din adresse</span>
                         </div>
                         <div class="field" id="zipField">
                             <label for="zipcode">Postnummer <span class="req">*</span></label>
-                            <!--
-                              zipcode is a FK in contact_info -> zip table.
-                              We show the zipcode string; on submit, the controller
-                              looks up zip_id by zipcode string.
-                            -->
+
                             <input type="text" id="zipcode" name="zipcode"
-                                   th:field="*{zipcode}"
-                                   th:value="${contactInfo != null ? contactInfo.zipcode : ''}"
+                                   th:value="${contactInfo != null ? contactInfo.zipcode : (prevZipcode != null ? prevZipcode : '')}"
                                    th:readonly="${contactInfo != null}"
                                    placeholder="Postnummer" required/>
                             <span class="field-error">Udfyld venligst dit postnummer</span>
@@ -409,8 +383,7 @@
                         <div class="field" id="cityField">
                             <label for="town">By <span class="req">*</span></label>
                             <input type="text" id="town" name="town"
-                                   th:field="*{town}"
-                                   th:value="${contactInfo != null ? contactInfo.town : ''}"
+                                   th:value="${contactInfo != null ? contactInfo.town : (prevTown != null ? prevTown : '')}"
                                    th:readonly="${contactInfo != null}"
                                    placeholder="By" required/>
                             <span class="field-error">Udfyld venligst din by</span>
@@ -418,8 +391,7 @@
                         <div class="field" id="emailField">
                             <label for="email">Email <span class="req">*</span></label>
                             <input type="email" id="email" name="email"
-                                   th:field="*{email}"
-                                   th:value="${contactInfo != null ? contactInfo.email : ''}"
+                                   th:value="${contactInfo != null ? contactInfo.email : (prevEmail != null ? prevEmail : '')}"
                                    th:readonly="${contactInfo != null}"
                                    placeholder="Email" required/>
                             <span class="field-error">Udfyld venligst din email</span>
@@ -427,8 +399,7 @@
                         <div class="field" id="phoneField">
                             <label for="phone">Telefon <span class="req">*</span></label>
                             <input type="tel" id="phone" name="phone"
-                                   th:field="*{phone}"
-                                   th:value="${contactInfo != null ? contactInfo.phone : ''}"
+                                   th:value="${contactInfo != null ? contactInfo.phone : (prevPhone != null ? prevPhone : '')}"
                                    th:readonly="${contactInfo != null}"
                                    placeholder="Telefon" required/>
                             <span class="field-error">Udfyld venligst dit telefonnummer</span>
