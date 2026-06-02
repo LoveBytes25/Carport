@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="da" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Bekræftelse – Fog</title>
+    <link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;600;700&display=swap" rel="stylesheet"/>
+    <link rel="stylesheet" href="/css/confirmation.css">
+</head>
+<body>
+
+<div class="card">
+
+    <div class="icon">
+        <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+    </div>
+
+    <h1>Forespørgsel modtaget!</h1>
+    <p>Tak for din henvendelse. Vi har modtaget din forespørgsel og en salgsperson vil vende tilbage hurtigst muligt med et tilbud.</p>
+
+    <div class="rq-id" th:text="'Forespørgsel #' + ${rqId}">Forespørgsel #42</div>
+
+    <p>Du vil blive kontaktet via telefon eller e-mail med dit tilbud, inklusiv en skitsetegning af din carport.</p>
+
+    <hr class="divider"/>
+
+    <a class="btn" href="/order">Lav ny forespørgsel</a>
+    <a class="btn-secondary" href="/">Tilbage til forsiden</a>
+
+</div>
+
+</body>
+</html>

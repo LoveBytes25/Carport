@@ -1,5 +1,6 @@
 package app.controllers;
 
+import app.config.ThymeleafConfig;
 import app.entities.CarportComponent;
 import app.entities.PriceSummary;
 
@@ -14,6 +15,7 @@ import io.javalin.Javalin;
 import io.javalin.http.Context;
 
 import org.thymeleaf.TemplateEngine;
+import org.thymeleaf.context.WebContext;
 
 import java.util.List;
 
@@ -59,7 +61,7 @@ public class PriceController {
 
         PriceSummary summary = priceService.calculatePrice(bom);
 
-        org.thymeleaf.context.Context thymeleafCtx = new org.thymeleaf.context.Context();
+        WebContext thymeleafCtx = ThymeleafConfig.buildWebContext(ctx);
 
         thymeleafCtx.setVariable("bom", bom);
 

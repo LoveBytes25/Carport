@@ -17,6 +17,92 @@ public class RequestMapper {
         this.connectionPool = connectionPool;
     }
 
+    // Request details
+    public RequestSummaryDTO getDetail(int rqId) throws DatabaseException {
+        String sql = """
+                SELECT
+                    r.rq_id,
+                    r.created_at,
+                    r.status,
+                    c.carp_id,
+                    c.width         AS carp_width,
+                    c.length        AS carp_length,
+                    c.height        AS carp_height,
+                    rt.name         AS roof_type_name,
+                    c.roof_angle    AS roof_angle,
+                    ci.first_name,
+                    ci.last_name,
+                    ci.email,
+                    ci.phone,
+                    (s.shed_id IS NOT NULL) AS has_shed,
+                    s.width         AS shed_width,
+                    s.length        AS shed_length,
+                    z.zipcode,
+                    z.town,
+                    ci.address,
+                    (c.width > 600 OR c.length > 800) AS flagged
+                FROM request r
+                JOIN carport      c  ON c.carp_id  = r.carp_id
+                JOIN roof_type    rt ON rt.rt_id   = c.rt_id
+                JOIN contact_info ci ON ci.ci_id   = r.ci_id
+                JOIN zip          z  ON z.zip_id   = ci.zip_id
+                LEFT JOIN shed    s  ON s.carp_id  = c.carp_id
+                WHERE r.rq_id = ?
+                """;
+
+        try (Connection connection = connectionPool.getConnection();
+             PreparedStatement ps = connection.prepareStatement(sql)) {
+
+            ps.setInt(1, rqId);
+            ResultSet rs = ps.executeQuery();
+
+            if (!rs.next()) {
+                throw new DatabaseException("Request not found", "rq_id = " + rqId);
+            }
+
+            return new RequestSummaryDTO(
+                    rs.getInt("rq_id"),
+                    rs.getTimestamp("created_at").toLocalDateTime(),
+                    rs.getString("status"),
+                    rs.getDouble("carp_width"),
+                    rs.getDouble("carp_length"),
+                    rs.getDouble("carp_height"),
+                    rs.getString("roof_type_name"),
+                    rs.getDouble("roof_angle"),
+                    rs.getString("first_name"),
+                    rs.getString("last_name"),
+                    rs.getString("email"),
+                    rs.getString("phone"),
+                    rs.getBoolean("has_shed"),
+                    rs.getBoolean("flagged")
+            );
+
+        } catch (SQLException e) {
+            throw new DatabaseException("Could not fetch request detail", e.getMessage());
+        }
+    }
+
+    // Get the carport ID (needed for SalesPerson)
+    public int getCarpIdByRequestId(int rqId) throws DatabaseException {
+        String sql = "SELECT carp_id FROM request WHERE rq_id = ?";
+
+        try (Connection connection = connectionPool.getConnection();
+             PreparedStatement ps = connection.prepareStatement(sql)) {
+
+            ps.setInt(1, rqId);
+            ResultSet rs = ps.executeQuery();
+
+            if (!rs.next()) {
+                throw new DatabaseException("Request not found", "rq_id = " + rqId);
+            }
+
+            return rs.getInt("carp_id");
+
+        } catch (SQLException e) {
+            throw new DatabaseException("Could not fetch carp_id", e.getMessage());
+        }
+    }
+
     // Roof types
     public List<RoofType> getAllRoofTypes() throws DatabaseException {
         String sql = "SELECT rt_id, name FROM roof_type ORDER BY name ASC";
@@ -68,6 +154,7 @@ public class RequestMapper {
                         rs.getString("zipcode"),
                         rs.getString("town")
                 );
+
                 return new ContactInfo(
                         rs.getInt("ci_id"),
                         rs.getString("first_name"),
@@ -89,6 +176,7 @@ public class RequestMapper {
     public int createContactInfo(Integer userId, String firstName, String lastName,
                                  String address, String phone,
                                  String email, int zipId) throws DatabaseException {
+
         String sql = """
                 INSERT INTO contact_info (user_id, first_name, last_name, address, phone, email, zip_id)
                 VALUES (?, ?, ?, ?, ?, ?, ?)
@@ -103,6 +191,7 @@ public class RequestMapper {
             } else {
                 ps.setNull(1, Types.INTEGER);
             }
+
             ps.setString(2, firstName);
             ps.setString(3, lastName);
             ps.setString(4, address);
@@ -136,6 +225,7 @@ public class RequestMapper {
                         rs.getString("town")
                 );
             }
+
             return null;
 
         } catch (SQLException e) {
@@ -168,10 +258,11 @@ public class RequestMapper {
     // Carport
     public int createCarport(Integer userId, int rtId,
                              double length, double width,
-                             double height) throws DatabaseException {
+                             double height, Double roofAngle) throws DatabaseException {
+
         String sql = """
-                INSERT INTO carport (user_id, rt_id, length, width, height, created_at)
-                VALUES (?, ?, ?, ?, ?, NOW())
+                INSERT INTO carport (user_id, rt_id, length, width, height, roof_angle, created_at)
+                VALUES (?, ?, ?, ?, ?, ?, NOW())
                 RETURNING carp_id
                 """;
 
@@ -183,10 +274,17 @@ public class RequestMapper {
             } else {
                 ps.setNull(1, Types.INTEGER);
             }
+
             ps.setInt(2, rtId);
             ps.setDouble(3, length);
             ps.setDouble(4, width);
             ps.setDouble(5, height);
+
+            if (roofAngle != null) {
+                ps.setDouble(6, roofAngle);
+            } else {
+                ps.setNull(6, Types.DOUBLE);
+            }
 
             ResultSet rs = ps.executeQuery();
             rs.next();
@@ -251,22 +349,22 @@ public class RequestMapper {
                     r.rq_id,
                     r.created_at,
                     r.status,
-                    c.width                             AS carp_width,
-                    c.length                            AS carp_length,
-                    c.height                            AS carp_height,
-                    rt.name                             AS roof_type_name,
-                    c.roof_angle                        AS roof_angle,
+                    c.width                           AS carp_width,
+                    c.length                          AS carp_length,
+                    c.height                          AS carp_height,
+                    rt.name                           AS roof_type_name,
+                    c.roof_angle                      AS roof_angle,
                     ci.first_name,
                     ci.last_name,
                     ci.email,
                     ci.phone,
-                    (s.shed_id IS NOT NULL)             AS has_shed,
-                    (c.width > 600 OR c.length > 800)   AS flagged
+                    (s.shed_id IS NOT NULL)          AS has_shed,
+                    (c.width > 600 OR c.length > 800) AS flagged
                 FROM request r
-                JOIN carport      c  ON c.carp_id = r.carp_id
-                JOIN roof_type    rt ON rt.rt_id   = c.rt_id
-                JOIN contact_info ci ON ci.ci_id   = r.ci_id
-                LEFT JOIN shed    s  ON s.carp_id  = c.carp_id
+                JOIN carport c ON c.carp_id = r.carp_id
+                JOIN roof_type rt ON rt.rt_id = c.rt_id
+                JOIN contact_info ci ON ci.ci_id = r.ci_id
+                LEFT JOIN shed s ON s.carp_id = c.carp_id
                 ORDER BY r.created_at DESC
                 """;
 
@@ -275,6 +373,7 @@ public class RequestMapper {
              ResultSet rs = ps.executeQuery()) {
 
             List<RequestSummaryDTO> list = new ArrayList<>();
+
             while (rs.next()) {
                 list.add(new RequestSummaryDTO(
                         rs.getInt("rq_id"),
@@ -293,6 +392,7 @@ public class RequestMapper {
                         rs.getBoolean("flagged")
                 ));
             }
+
             return list;
 
         } catch (SQLException e) {

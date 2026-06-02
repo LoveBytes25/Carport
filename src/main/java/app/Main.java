@@ -2,6 +2,7 @@ package app;
 
 import app.config.ThymeleafConfig;
 import app.controllers.LoginController;
+import app.controllers.OrderController;
 import app.persistence.ConnectionPool;
 import app.persistence.RequestMapper;
 import app.controllers.SalespersonController;
@@ -35,11 +36,12 @@ public class Main
         });
 
         // Redirect root
-        app.get("/", ctx -> ctx.redirect("/salesperson/requests"));
+        app.get("/", ctx -> ctx.redirect("/order"));
 
         // Register controllers
-        new SalespersonController(templateEngine, requestMapper).register(app);
         new LoginController(templateEngine, userMapper, connectionPool).register(app);
+        new SalespersonController(templateEngine, requestMapper, connectionPool).register(app);
+        new OrderController(templateEngine, requestMapper).register(app);
 
         System.out.println("Server running on http://localhost:7070");
     }
