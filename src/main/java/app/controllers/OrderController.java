@@ -26,6 +26,15 @@ public class OrderController {
     public void register(Javalin app) {
         app.get("/order",           this::showOrderForm);
         app.post("/request/submit", this::submitRequest);
+        app.get("/request/confirmation", this::showConfirmation);
+    }
+
+    private void showConfirmation(io.javalin.http.Context ctx) {
+        String rqId = ctx.queryParam("rqId");
+        WebContext thymeleafCtx = ThymeleafConfig.buildWebContext(ctx);
+        thymeleafCtx.setVariable("rqId", rqId);
+        thymeleafCtx.setVariable("user", ctx.sessionAttribute("user"));
+        ctx.html(templateEngine.process("confirmation", thymeleafCtx));
     }
 
     private void showOrderForm(io.javalin.http.Context ctx) throws DatabaseException {
@@ -63,7 +72,6 @@ public class OrderController {
                 height = slopeStr != null ? Double.parseDouble(slopeStr) : 25;
             }
 
-            // Resolve or create contact_info
             int ciId;
             if (loggedInUser != null) {
                 ContactInfo existing = requestMapper.findContactInfoByUserId(loggedInUser.getId());
