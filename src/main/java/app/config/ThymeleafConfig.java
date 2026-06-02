@@ -1,8 +1,12 @@
 package app.config;
 
+import io.javalin.http.Context;
 import org.thymeleaf.TemplateEngine;
+import org.thymeleaf.context.WebContext;
 import org.thymeleaf.templatemode.TemplateMode;
 import org.thymeleaf.templateresolver.ClassLoaderTemplateResolver;
+import org.thymeleaf.web.IWebExchange;
+import org.thymeleaf.web.servlet.JakartaServletWebApplication;
 
 public class ThymeleafConfig {
 
@@ -27,5 +31,11 @@ public class ThymeleafConfig {
         TemplateEngine engine = new TemplateEngine();
         engine.setTemplateResolver(resolver);
         return engine;
+    }
+
+    public static WebContext buildWebContext(Context ctx) {
+        JakartaServletWebApplication application = JakartaServletWebApplication.buildApplication(ctx.req().getServletContext());
+        IWebExchange exchange = application.buildExchange(ctx.req(), ctx.res());
+        return new WebContext(exchange);
     }
 }
