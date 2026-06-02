@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<html lang="da" xmlns:th="http://www.thymeleaf.org">
+<html lang="da" xmlns:th="http://www.thymeleaf.org" xmlns:font-family="http://www.w3.org/1999/xhtml"
+      xmlns:cursor="http://www.w3.org/1999/xhtml">
 <head>
     <meta charset="UTF-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
@@ -98,7 +99,6 @@
             </div>
         </div>
 
-        <!-- BOM table — from MaterialCalculationService -->
         <div class="card grid-full">
             <div class="card-header">Stykliste</div>
             <div class="card-body" style="padding:0">
@@ -128,7 +128,6 @@
             </div>
         </div>
 
-        <!-- Pricing — from PriceCalculationService -->
         <div class="card grid-full">
             <div class="card-header">Priser (ekskl. moms)</div>
             <div class="card-body">
@@ -137,8 +136,24 @@
                     <span class="pricing-value" th:text="${#numbers.formatDecimal(priceSummary.materialPrice, 0, 'COMMA', 0, 'POINT')} + ' kr.'">12.450 kr.</span>
                 </div>
                 <div class="pricing-row">
-                    <span class="pricing-label">Anbefalet salgspris ekskl. moms</span>
-                    <span class="pricing-value" th:text="${#numbers.formatDecimal(priceSummary.salesPriceExclVat, 0, 'COMMA', 0, 'POINT')} + ' kr.'">20.000 kr.</span>
+                    <span class="pricing-label">Salgspris (justerbar)</span>
+                    <form method="post"
+                          th:action="@{/salesperson/request/{id}/price(id=${detail.rqId})}"
+                          style="display:inline-flex; align-items:center; gap:8px">
+                        <input type="number"
+                            id="salesPriceInput"
+                            name="salesPrice"
+                            th:value="${priceSummary.salesPriceExclVat}"
+                        oninput="updateCoverage(this.value)"
+                        style="border:1.5px solid #d4d4d0; border-radius:3px; padding:6px 10px; font-size:15px; font-weight:700; color:#1b3a5c; width:140px; font-family:inherit; outline:none;"/>
+                        <span style="color:#666;font-size:13px;">kr.</span>
+                        <input type="hidden" id="salesPriceHidden" name="salesPrice"
+                               th:value="${#numbers.formatDecimal(priceSummary.salesPriceExclVat, 0, 'COMMA', 0, 'POINT')}"/>
+                        <button type="submit"
+                                style="background:#f0f0ec; border:1px solid #d4d4d0; border-radius:3px; padding:6px 12px; font-size:12px; font-weight:600; font-family:inherit; cursor:pointer;">
+                            Gem pris
+                        </button>
+                    </form>
                 </div>
                 <div class="pricing-row">
                     <span class="pricing-label">Moms (25%)</span>
@@ -150,14 +165,14 @@
                 </div>
                 <div class="pricing-row">
                     <span class="pricing-label">Dækningsgrad</span>
-                    <span class="pricing-value green" th:text="${coverageRate} + ' %'">39.0 %</span>
+                    <span class="pricing-value green" id="coverageDisplay"
+                        th:text="${coverageRate} + ' %'">39.0%</span>
                 </div>
             </div>
         </div>
 
     </div>
 
-    <!-- Action buttons -->
     <div class="actions">
         <form method="post" th:action="@{/salesperson/request/{id}/status(id=${detail.rqId})}">
             <input type="hidden" name="status" value="SENT"/>
@@ -180,5 +195,20 @@
     </div>
 
 </div>
+
+<script>
+    const materialPrice = [[${priceSummary.materialPrice}]];
+
+    function updateCoverage(salesPrice) {
+        const sp = parseFloat(salesPrice) || 0;
+        document.getElementById('salesPriceHidden').value = sp;
+        if (sp <= 0) {
+            document.getElementById('coverageDisplay').textContent = '0.0 %';
+            return;
+        }
+        const coverage = ((sp - materialPrice) / sp * 100).toFixed(1);
+        document.getElementById('coverageDisplay').textContent = coverage + ' %';
+    }
+</script>
 </body>
 </html>
