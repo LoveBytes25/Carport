@@ -5,7 +5,7 @@ import java.time.LocalDateTime;
 public class RequestSummaryDTO {
 
     private int           rqId;
-    private String createdAt;
+    private LocalDateTime createdAt;
     private String        status;        // PENDING | SENT | ACCEPTED | REJECTED
     private double        carpWidth;
     private double        carpLength;
@@ -19,7 +19,7 @@ public class RequestSummaryDTO {
     private boolean       hasShed;
     private boolean       flagged;
 
-    public RequestSummaryDTO(int rqId, String createdAt, String status,
+    public RequestSummaryDTO(int rqId, LocalDateTime createdAt, String status,
                              double carpWidth, double carpLength, double carpHeight, String roofTypeName,
                              double roofAngle, String firstName, String lastName,
                              String email, String phone,
@@ -41,7 +41,7 @@ public class RequestSummaryDTO {
     }
 
     public int           getRqId()        { return rqId; }
-    public String getCreatedAt()   { return createdAt; }
+    public LocalDateTime getCreatedAt()   { return createdAt; }
     public String        getStatus()      { return status; }
     public double        getCarpWidth()   { return carpWidth; }
     public double        getCarpLength()  { return carpLength; }

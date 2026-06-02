@@ -278,7 +278,7 @@ public class RequestMapper {
             while (rs.next()) {
                 list.add(new RequestSummaryDTO(
                         rs.getInt("rq_id"),
-                        rs.getTimestamp("created_at").toString(),
+                        rs.getTimestamp("created_at").toLocalDateTime(),
                         rs.getString("status"),
                         rs.getDouble("carp_width"),
                         rs.getDouble("carp_length"),

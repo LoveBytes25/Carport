@@ -30,6 +30,10 @@ public class Main
             config.staticFiles.add("public", Location.CLASSPATH);
         }).start(7070);
 
+        app.exception(Exception.class, (e, ctx) -> {
+            e.printStackTrace();
+        });
+
         // Redirect root
         app.get("/", ctx -> ctx.redirect("/salesperson/requests"));
 
