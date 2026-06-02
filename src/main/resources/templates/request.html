@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="da" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Forespørgsel – Fog</title>
+    <link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+    <link rel="stylesheet" href="/css/request.css">
+</head>
+<body>
+
+<nav>
+    <a class="nav-logo" href="/">Fog</a>
+    <div class="nav-links">
+        <a href="/salesperson/requests" class="active">Forespørgsler</a>
+    </div>
+    <div class="nav-right">
+        <div class="nav-user">
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+            <span th:text="${user != null ? user.email : 'Salgsperson'}">salgsperson@fog.dk</span>
+        </div>
+        <a class="nav-logout" href="/logout">Log ud</a>
+    </div>
+</nav>
+
+<div class="page">
+
+    <a class="back-link" href="/salesperson/requests">
+        <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+        Tilbage til oversigt
+    </a>
+
+    <div class="page-header">
+        <div>
+            <h1 th:text="'Forespørgsel #' + ${detail.rqId}">Forespørgsel #42</h1>
+            <p th:text="'Modtaget: ' + ${detail.createdAt}">Modtaget: 12/05/2025</p>
+        </div>
+        <span th:switch="${detail.status}">
+      <span th:case="'PENDING'"  class="badge pending"><span class="badge-dot"></span>Afventer</span>
+      <span th:case="'SENT'"     class="badge sent"><span class="badge-dot"></span>Tilbud sendt</span>
+      <span th:case="'ACCEPTED'" class="badge accepted"><span class="badge-dot"></span>Accepteret</span>
+      <span th:case="'REJECTED'" class="badge rejected"><span class="badge-dot"></span>Afvist</span>
+      <span th:case="*"          class="badge pending"><span class="badge-dot"></span>Ukendt</span>
+    </span>
+    </div>
+
+    <!-- Flag if unusual measurements -->
+    <div class="flag-banner" th:if="${detail.flagged}">
+        <svg viewBox="0 0 24 24"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg>
+        Usædvanlige mål — kontakt kunden inden du fortsætter.
+    </div>
+
+    <div class="grid">
+
+        <!-- Carport config -->
+        <div class="card">
+            <div class="card-header">Carport konfiguration</div>
+            <div class="card-body">
+                <div class="info-row">
+                    <span class="info-label">Tagtype</span>
+                    <span class="info-value" th:text="${detail.roofTypeName}">Plastmo</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Bredde</span>
+                    <span class="info-value" th:text="${detail.carpWidth} + ' cm'">330 cm</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Længde</span>
+                    <span class="info-value" th:text="${detail.carpLength} + ' cm'">500 cm</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Højde</span>
+                    <span class="info-value" th:text="${detail.carpHeight} + ' cm'">210 cm</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Skur</span>
+                    <span class="info-value" th:text="${detail.hasShed} ? 'Ja' : 'Nej'">Nej</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Customer info -->
+        <div class="card">
+            <div class="card-header">Kundeoplysninger</div>
+            <div class="card-body">
+                <div class="info-row">
+                    <span class="info-label">Navn</span>
+                    <span class="info-value" th:text="${detail.firstName + ' ' + detail.lastName}">Anders Nielsen</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Email</span>
+                    <span class="info-value" th:text="${detail.email}">anders@email.dk</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Telefon</span>
+                    <span class="info-value" th:text="${detail.phone}">22 33 44 55</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- BOM table — from MaterialCalculationService -->
+        <div class="card grid-full">
+            <div class="card-header">Stykliste</div>
+            <div class="card-body" style="padding:0">
+                <table class="bom-table">
+                    <thead>
+                    <tr>
+                        <th>Materiale</th>
+                        <th>Antal</th>
+                        <th>Enhed</th>
+                        <th>Længde (mm)</th>
+                        <th>Beskrivelse</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="line : ${bom}">
+                        <td th:text="${line.component.name}">Stolpe</td>
+                        <td th:text="${line.quantity}">6</td>
+                        <td th:text="${line.component.unit}">stk</td>
+                        <td th:text="${line.component.length}">3000</td>
+                        <td th:text="${line.description}">Stolper nedgraves 90 cm i jord</td>
+                    </tr>
+                    <tr th:if="${#lists.isEmpty(bom)}">
+                        <td colspan="5" style="text-align:center;padding:20px;color:var(--light)">Ingen stykliste</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Pricing — from PriceCalculationService -->
+        <div class="card grid-full">
+            <div class="card-header">Priser (ekskl. moms)</div>
+            <div class="card-body">
+                <div class="pricing-row">
+                    <span class="pricing-label">Materialepris (købspris)</span>
+                    <span class="pricing-value" th:text="${#numbers.formatDecimal(priceSummary.materialPrice, 0, 'COMMA', 0, 'POINT')} + ' kr.'">12.450 kr.</span>
+                </div>
+                <div class="pricing-row">
+                    <span class="pricing-label">Anbefalet salgspris ekskl. moms</span>
+                    <span class="pricing-value" th:text="${#numbers.formatDecimal(priceSummary.salesPriceExclVat, 0, 'COMMA', 0, 'POINT')} + ' kr.'">20.000 kr.</span>
+                </div>
+                <div class="pricing-row">
+                    <span class="pricing-label">Moms (25%)</span>
+                    <span class="pricing-value" th:text="${#numbers.formatDecimal(priceSummary.vatAmount, 0, 'COMMA', 0, 'POINT')} + ' kr.'">5.000 kr.</span>
+                </div>
+                <div class="pricing-row">
+                    <span class="pricing-label">Totalpris inkl. moms</span>
+                    <span class="pricing-value" th:text="${#numbers.formatDecimal(priceSummary.totalPriceInclVat, 0, 'COMMA', 0, 'POINT')} + ' kr.'">25.000 kr.</span>
+                </div>
+                <div class="pricing-row">
+                    <span class="pricing-label">Dækningsgrad</span>
+                    <span class="pricing-value green" th:text="${coverageRate} + ' %'">39.0 %</span>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Action buttons -->
+    <div class="actions">
+        <form method="post" th:action="@{/salesperson/request/{id}/status(id=${detail.rqId})}">
+            <input type="hidden" name="status" value="SENT"/>
+            <button class="btn btn-success" type="submit">
+                <svg viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+                Send tilbud til kunde
+            </button>
+        </form>
+        <form method="post" th:action="@{/salesperson/request/{id}/status(id=${detail.rqId})}">
+            <input type="hidden" name="status" value="REJECTED"/>
+            <button class="btn btn-danger" type="submit">
+                <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                Afvis forespørgsel
+            </button>
+        </form>
+        <a class="btn btn-secondary" href="/salesperson/requests">
+            <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+            Tilbage
+        </a>
+    </div>
+
+</div>
+</body>
+</html>
