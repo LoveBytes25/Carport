@@ -209,13 +209,9 @@
 
                     <div class="field-grid-3">
                         <div class="field">
-                            <label for="rtId">Tagtype <span class="req">*</span></label>
+                            <label for="rtId">Tagmateriale <span class="req">*</span></label>
                             <select id="rtId" name="rtId" required>
                                 <option value="">Vælg tagtype</option>
-
-                                <option th:each="rt : ${roofTypes}"
-                                        th:value="${rt.Id}"
-                                        th:text="${rt.name}">Plastmo Ecolite – Blå</option>
                             </select>
                         </div>
 
@@ -438,16 +434,41 @@
     let hasShed   = false;
     let curView   = 'top';
 
+    function updateRoofMaterialOptions() {
+        const select = document.getElementById('rtId');
+        if (!select) return;
+
+        const current = select.value;
+        select.innerHTML = '<option value="">Vælg tagtype</option>';
+
+        if (roofType === 'flat') {
+            const opt = document.createElement('option');
+            opt.value = 'Tagplade';
+            opt.textContent = 'Tagplade';
+            select.appendChild(opt);
+        } else {
+            const opt = document.createElement('option');
+            opt.value = 'Tagsten';
+            opt.textContent = 'Tagsten';
+            select.appendChild(opt);
+        }
+
+        if ([...select.options].some(o => o.value === current)) {
+            select.value = current;
+        }
+    }
+
     /* ─── Thymeleaf pre-fill detection ───
-       If contactInfo was injected server-side (user is logged in),
-       the inputs will be readonly — mark them as prefilled visually.
-    */
+          If contactInfo was injected server-side (user is logged in),
+          the inputs will be readonly — mark them as prefilled visually.
+       */
     document.addEventListener('DOMContentLoaded', () => {
         const fn = document.getElementById('firstName');
         if (fn && fn.readOnly && fn.value.trim() !== '') {
             applyPrefilledStyle();
         }
         updatePreview();
+        updateRoofMaterialOptions();
     });
 
     function applyPrefilledStyle() {
@@ -490,6 +511,7 @@
             ? 'Quick-Byg carport med fladt tag'
             : 'Quick-Byg carport med høj rejsning';
 
+        updateRoofMaterialOptions();
         updatePreview();
     }
 
@@ -654,6 +676,7 @@
         const el = document.getElementById(id);
         if (el) el.setAttribute(name, val);
     }
+
     function set(id, name, val) { attr(id, name, val); }
 
     /* ─── FORM VALIDATION ─── */
@@ -677,6 +700,7 @@
         }
         return valid;
     }
+
 </script>
 
 </body>
