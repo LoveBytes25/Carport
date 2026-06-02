@@ -45,7 +45,7 @@ public class UserMapper {
             throws DatabaseException {
 
         String sql = """
-            INSERT INTO public.users (email, password_hash, role)
+            INSERT INTO public.users (email, password, role)
             VALUES (?, ?, ?)
         """;
 
@@ -69,7 +69,7 @@ public class UserMapper {
         List<User> users = new ArrayList<>();
 
         String sql = """
-            SELECT user_id, email, password_hash, role
+            SELECT user_id, email, password, role
             FROM public.users
         """;
 
@@ -82,7 +82,7 @@ public class UserMapper {
                 users.add(new User(
                         rs.getInt("user_id"),
                         rs.getString("email"),
-                        rs.getString("password_hash"),
+                        rs.getString("password"),
                         Role.valueOf(rs.getString("role"))
                 ));
             }
@@ -96,7 +96,7 @@ public class UserMapper {
 
     public static User findByEmailAndPassword(String email, String password, ConnectionPool cp) throws DatabaseException {
         String sql = """
-            SELECT user_id, email, password_hash, role
+            SELECT user_id, email, password, role
             FROM public.users
             WHERE email = ?
             """;
@@ -111,7 +111,7 @@ public class UserMapper {
                 return null;
             }
 
-            String storedHash = rs.getString("password_hash");
+            String storedHash = rs.getString("password");
 
             boolean passwordMatches = org.mindrot.jbcrypt.BCrypt.checkpw(password, storedHash);
 
