@@ -59,6 +59,10 @@ public class ContactInfo {
         return email;
     }
 
+    public Zip getZip() {
+        return zip;
+    }
+
     public void setEmail(String email) {
         this.email = email;
     }
