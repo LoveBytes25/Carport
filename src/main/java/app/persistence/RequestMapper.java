@@ -255,7 +255,7 @@ public class RequestMapper {
                     c.length                            AS carp_length,
                     c.height                            AS carp_height,
                     rt.name                             AS roof_type_name,
-                    c.roof_angle                        AS roof_angle
+                    c.roof_angle                        AS roof_angle,
                     ci.first_name,
                     ci.last_name,
                     ci.email,
@@ -278,7 +278,7 @@ public class RequestMapper {
             while (rs.next()) {
                 list.add(new RequestSummaryDTO(
                         rs.getInt("rq_id"),
-                        rs.getTimestamp("created_at").toLocalDateTime(),
+                        rs.getTimestamp("created_at").toString(),
                         rs.getString("status"),
                         rs.getDouble("carp_width"),
                         rs.getDouble("carp_length"),
