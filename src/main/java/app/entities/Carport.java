@@ -7,13 +7,15 @@ public class Carport {
     private Double height;
     private Double width;
     private Double length;
+    private Double roofAngle;
     private LocalDateTime timestamp;
 
-    public Carport(int id, Double height, Double width, Double length, LocalDateTime timestamp) {
+    public Carport(int id, Double height, Double width, Double length, Double roofAngle, LocalDateTime timestamp) {
         this.id = id;
         this.height = height;
         this.width = width;
         this.length = length;
+        this.roofAngle = roofAngle;
         this.timestamp = timestamp;
     }
 
@@ -43,6 +45,14 @@ public class Carport {
 
     public void setLength(Double length) {
         this.length = length;
+    }
+
+    public Double getRoofAngle() {
+        return roofAngle;
+    }
+
+    public void setRoofAngle() {
+        this.roofAngle = roofAngle;
     }
 
     public LocalDateTime getTimestamp() {
