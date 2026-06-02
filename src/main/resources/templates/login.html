@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="da" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Log ind – Fog</title>
+    <link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;600;700&display=swap" rel="stylesheet"/>
+    <style href="public/css/login.css"></style>
+</head>
+<body>
+
+<div class="logo">Fog</div>
+
+<div class="card">
+    <h1>Log ind</h1>
+    <p>Indtast dine oplysninger for at fortsætte</p>
+
+    <!-- Error banner — shown if controller sets errorMessage -->
+    <div class="error" th:if="${errorMessage}" th:text="${errorMessage}"></div>
+
+    <form method="post" th:action="@{/login}">
+        <div class="field">
+            <label for="email">Email</label>
+            <input type="email" id="email" name="email"
+                   placeholder="din@email.dk" required autofocus/>
+        </div>
+        <div class="field">
+            <label for="password">Adgangskode</label>
+            <input type="password" id="password" name="password"
+                   placeholder="••••••••" required/>
+        </div>
+        <button class="btn" type="submit">Log ind</button>
+    </form>
+</div>
+
+</body>
+</html>
