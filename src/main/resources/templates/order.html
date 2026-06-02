@@ -417,9 +417,13 @@
     </div>
 </div>
 
+<footer style="text-align:center; padding:24px; font-size:12px; color:#999; border-top:1px solid #e8e8e4; margin-top:40px;">
+    Dette er et semesterprojekt udviklet af studerende på Erhvervsakademi København. Siden er ikke et rigtigt bestillingssystem.
+</footer>
+
 
 <script>
-    /* ─── State ─── */
+
     let roofType  = 'flat';
     let hasShed   = false;
     let curView   = 'top';
@@ -509,7 +513,6 @@
         updatePreview();
     }
 
-    /* ─── SLOPE SLIDER ─── */
     function updateSlope(val) {
         document.getElementById('slopeVal').textContent  = val + ' grader';
         document.getElementById('dimSlope').textContent  = val + '°';
