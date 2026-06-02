@@ -93,4 +93,41 @@ public class UserMapper {
             throw new DatabaseException("Error fetching users", e.getMessage());
         }
     }
+
+    public static User findByEmailAndPassword(String email, String password, ConnectionPool cp) throws DatabaseException {
+        String sql = """
+            SELECT user_id, email, password_hash, role
+            FROM public.users
+            WHERE email = ?
+            """;
+
+        try (Connection connection = cp.getConnection();
+             PreparedStatement ps = connection.prepareStatement(sql)) {
+
+            ps.setString(1, email);
+            ResultSet rs = ps.executeQuery();
+
+            if (!rs.next()) {
+                return null;
+            }
+
+            String storedHash = rs.getString("password_hash");
+
+            boolean passwordMatches = org.mindrot.jbcrypt.BCrypt.checkpw(password, storedHash);
+
+            if (!passwordMatches) {
+                return null;
+            }
+
+            return new User(
+                    rs.getInt("user_id"),
+                    rs.getString("email"),
+                    rs.getString("password"),
+                    Role.valueOf(rs.getString("role"))
+            );
+
+        } catch (SQLException e) {
+            throw new DatabaseException("Could not verify login", e.getMessage());
+        }
+    }
 }
