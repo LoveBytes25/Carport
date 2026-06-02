@@ -82,7 +82,7 @@ public class RequestMapper {
         }
     }
 
-    // Get the carport ID (needed for SalesPerson)
+    // Get the carport ID
     public int getCarpIdByRequestId(int rqId) throws DatabaseException {
         String sql = "SELECT carp_id FROM request WHERE rq_id = ?";
 
@@ -165,7 +165,7 @@ public class RequestMapper {
                         zip
                 );
             }
-            return null; // no contact info found for this user
+            return null;
 
         } catch (SQLException e) {
             throw new DatabaseException("Could not fetch contact info", e.getMessage());

@@ -119,8 +119,6 @@ public class OrderController {
         }
     }
 
-    /* ── Helpers ── */
-
     private int createContactInfo(io.javalin.http.Context ctx, Integer userId) throws Exception {
         String firstName = ctx.formParam("firstName");
         String lastName = ctx.formParam("lastName");
@@ -130,7 +128,6 @@ public class OrderController {
         String email = ctx.formParam("email");
         String phone = ctx.formParam("phone");
 
-        // Find or create zip row
         Zip zip = requestMapper.findZipByZipcode(zipcodeStr);
         int zipId = zip != null ? zip.getId() : requestMapper.createZip(zipcodeStr, town);
 
