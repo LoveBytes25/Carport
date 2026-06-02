@@ -414,4 +414,16 @@ public class RequestMapper {
             throw new DatabaseException("Could not update request status", e.getMessage());
         }
     }
+
+    public void updateSalesPrice(int rqId, double salesPrice) throws DatabaseException {
+        String sql = "UPDATE request SET sales_price = ? WHERE rq_id = ?";
+        try (Connection connection = connectionPool.getConnection();
+        PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setDouble(1, salesPrice);
+            ps.setInt(2, rqId);
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            throw new DatabaseException("Could not update sales price", e.getMessage());
+        }
+    }
 }
