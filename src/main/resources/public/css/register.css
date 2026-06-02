@@ -1,0 +1,50 @@
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+    font-family: 'Source Sans 3', sans-serif;
+    background: #f2f3f5;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+}
+.logo {
+    background: #2a56a4; color: #fff; font-size: 22px; font-weight: 700;
+    width: 56px; height: 46px; display: flex; align-items: center;
+    justify-content: center; border-radius: 3px; margin-bottom: 24px;
+}
+.card {
+    background: #fff; border: 1px solid #d4d4d0; border-radius: 6px;
+    padding: 32px 36px; width: 100%; max-width: 420px;
+}
+.card h1 { font-size: 20px; font-weight: 700; color: #1b3a5c; margin-bottom: 6px; }
+.card p  { font-size: 13px; color: #888; margin-bottom: 24px; }
+.field { display: flex; flex-direction: column; gap: 4px; margin-bottom: 12px; }
+.field label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #333; }
+.field input {
+    border: 1px solid #d4d4d0; border-radius: 3px; padding: 9px 10px;
+    font-size: 14px; font-family: inherit; outline: none; transition: border-color 0.15s;
+}
+.field input:focus { border-color: #2a56a4; box-shadow: 0 0 0 2px rgba(42,86,164,0.14); }
+.field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.error {
+    background: #fdecea; border: 1px solid #f5c6c2; border-radius: 3px;
+    padding: 10px 12px; font-size: 13px; color: #c0392b; font-weight: 600; margin-bottom: 16px;
+}
+.success {
+    background: #e8f5e9; border: 1px solid #a5d6a7; border-radius: 3px;
+    padding: 10px 12px; font-size: 13px; color: #2e7d32; font-weight: 600; margin-bottom: 16px;
+}
+.btn {
+    background: #2a56a4; color: #fff; border: none; border-radius: 3px;
+    padding: 11px 0; font-size: 14.5px; font-weight: 700; font-family: inherit;
+    cursor: pointer; width: 100%; margin-top: 6px; transition: background 0.15s;
+}
+.btn:hover { background: #1e4080; }
+.login-link { text-align: center; margin-top: 14px; font-size: 13px; color: #888; }
+.login-link a { color: #2a56a4; font-weight: 600; text-decoration: none; }
+.divider { border: none; border-top: 1px solid #e8e8e4; margin: 16px 0; }
+.section-label {
+    font-size: 11px; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 0.06em; color: #999; margin-bottom: 10px;
+}
