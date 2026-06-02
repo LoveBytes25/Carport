@@ -329,7 +329,7 @@
                     <div class="section-title">Evt. bemærkninger</div>
                     <div class="field">
             <textarea id="comments" name="comments"
-                      th:value="${contactInfo != null ? contactInfo.comments : (prevComments != null ? prevComments : '')}"
+                      th:text="${prevComments != null ? prevComments : ''}"
                       placeholder="Skriv eventuelle bemærkninger her..."></textarea>
                     </div>
                 </div>
@@ -375,7 +375,7 @@
                             <label for="zipcode">Postnummer <span class="req">*</span></label>
 
                             <input type="text" id="zipcode" name="zipcode"
-                                   th:value="${contactInfo != null ? contactInfo.zipcode : (prevZipcode != null ? prevZipcode : '')}"
+                                   th:value="${contactInfo != null ? contactInfo.zip.zipcode : (prevZipcode != null ? prevZipcode : '')}"
                                    th:readonly="${contactInfo != null}"
                                    placeholder="Postnummer" required/>
                             <span class="field-error">Udfyld venligst dit postnummer</span>
@@ -383,7 +383,7 @@
                         <div class="field" id="cityField">
                             <label for="town">By <span class="req">*</span></label>
                             <input type="text" id="town" name="town"
-                                   th:value="${contactInfo != null ? contactInfo.town : (prevTown != null ? prevTown : '')}"
+                                   th:value="${contactInfo != null ? contactInfo.zip.town : (prevTown != null ? prevTown : '')}"
                                    th:readonly="${contactInfo != null}"
                                    placeholder="By" required/>
                             <span class="field-error">Udfyld venligst din by</span>
