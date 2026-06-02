@@ -1,11 +1,13 @@
 package app.controllers;
 
+import app.config.ThymeleafConfig;
 import app.entities.*;
 import app.exceptions.DatabaseException;
 import app.persistence.RequestMapper;
 import io.javalin.Javalin;
 
 import org.thymeleaf.TemplateEngine;
+import org.thymeleaf.context.WebContext;
 
 
 import java.util.List;
@@ -37,7 +39,7 @@ public class OrderController {
         // Fetch roof types for the tagtype dropdown
         List<RoofType> roofTypes = requestMapper.getAllRoofTypes();
 
-        org.thymeleaf.context.Context thymeleafCtx = new org.thymeleaf.context.Context();
+        WebContext thymeleafCtx = ThymeleafConfig.buildWebContext(ctx);
         thymeleafCtx.setVariable("roofTypes",   roofTypes);
         thymeleafCtx.setVariable("contactInfo", contactInfo);
         thymeleafCtx.setVariable("user",        loggedInUser);
@@ -127,11 +129,21 @@ public class OrderController {
             contactInfo = requestMapper.findContactInfoByUserId(loggedInUser.getId());
         }
 
-        org.thymeleaf.context.Context thymeleafCtx = new org.thymeleaf.context.Context();
+        WebContext thymeleafCtx = ThymeleafConfig.buildWebContext(ctx);
         thymeleafCtx.setVariable("roofTypes",    roofTypes);
         thymeleafCtx.setVariable("contactInfo",  contactInfo);
         thymeleafCtx.setVariable("user",         loggedInUser);
         thymeleafCtx.setVariable("errorMessage", errorMessage);
+
+        // Remember information if entered wrong
+        thymeleafCtx.setVariable("prevFirstName", ctx.formParam("firstName"));
+        thymeleafCtx.setVariable("prevLastName",  ctx.formParam("lastName"));
+        thymeleafCtx.setVariable("prevAddress",   ctx.formParam("address"));
+        thymeleafCtx.setVariable("prevZipcode",   ctx.formParam("zipcode"));
+        thymeleafCtx.setVariable("prevTown",      ctx.formParam("town"));
+        thymeleafCtx.setVariable("prevEmail",     ctx.formParam("email"));
+        thymeleafCtx.setVariable("prevPhone",     ctx.formParam("phone"));
+        thymeleafCtx.setVariable("prevComments",  ctx.formParam("comments"));
 
         String html = templateEngine.process("order", thymeleafCtx);
         ctx.html(html);

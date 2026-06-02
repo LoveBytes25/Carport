@@ -13,6 +13,7 @@ import app.services.PriceCalculationService;
 import io.javalin.Javalin;
 import io.javalin.http.Context;
 import org.thymeleaf.TemplateEngine;
+import org.thymeleaf.context.WebContext;
 
 import java.sql.SQLException;
 import java.util.List;
@@ -53,7 +54,7 @@ try {
     long sent = requests.stream().filter(r -> "SENT".equals(r.getStatus())).count();
     long accepted = requests.stream().filter(r -> "ACCEPTED".equals(r.getStatus())).count();
 
-    org.thymeleaf.context.Context thymeleafCtx = new org.thymeleaf.context.Context();
+    WebContext thymeleafCtx = ThymeleafConfig.buildWebContext(ctx);
     thymeleafCtx.setVariable("requests", requests);
     thymeleafCtx.setVariable("totalCount", total);
     thymeleafCtx.setVariable("pendingCount", pending);
@@ -97,7 +98,7 @@ try {
             // Dækningsgrad
             double coverageRate = (priceSummary.getSalesPriceExclVat() - priceSummary.getMaterialPrice()) / priceSummary.getSalesPriceExclVat() * 100;
 
-            org.thymeleaf.context.Context tc = new org.thymeleaf.context.Context();
+            WebContext tc = ThymeleafConfig.buildWebContext(ctx);
             tc.setVariable("detail",       detail);
             tc.setVariable("bom",          bom);
             tc.setVariable("priceSummary", priceSummary);
