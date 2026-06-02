@@ -35,6 +35,7 @@ public class SalespersonController {
             return;
         }
 
+
         List<RequestSummaryDTO> requests = requestMapper.getAllSummaries();
 
         long total    = requests.size();
@@ -66,4 +67,5 @@ public class SalespersonController {
         // Skal tilføje
         ctx.result("Detail view for request #" + rqId + " — coming soon");
     }
+
 }
