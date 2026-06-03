@@ -29,7 +29,7 @@ public class Main
         Javalin app = Javalin.create(config ->
         {
             config.staticFiles.add("public", Location.CLASSPATH);
-        }).start(7070);
+        }).start("0.0.0.0",7070);
 
         app.exception(Exception.class, (e, ctx) -> {
             e.printStackTrace();
