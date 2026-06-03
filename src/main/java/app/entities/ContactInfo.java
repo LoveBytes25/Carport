@@ -47,6 +47,10 @@ public class ContactInfo {
         this.address = address;
     }
 
+    public Zip getZip() {
+        return zip;
+    }
+
     public String getPhone() {
         return phone;
     }
