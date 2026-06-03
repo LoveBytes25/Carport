@@ -33,8 +33,8 @@ public class MaterialCalculationService {
             double roofAngle)
             throws DatabaseException {
 
-        double carportLengthMm = carportLength * 10; // Input from frontend comes in as cm
-        double carportWidthMm  = carportWidth * 10;  // Input from frontend comes in as cm
+        double carportLengthMm = carportLength;
+        double carportWidthMm  = carportWidth ;
 
         List<CarportComponent> bom = new ArrayList<>();
 
